@@ -279,14 +279,23 @@ def update_dash_table(df, set_id: str):
     )
 
     return table
-    
-def update_graph(df_input):
+
+
+def update_graph(df_input, click_data=None):
     # if selected_party == "Alle partijen":
         # df_filtered = df_input.copy()
     # else:
         # df_filtered = df_input[df_input["Partij"] == selected_party]  
 
-    df_input = df_input.sort_values(by="Aantal commissies als vast lid", ascending=False)  # Sort by count
+    if click_data and 'xaxis.range[0]' in click_data['relayoutData']:
+        sort_col = 'Parlementslid'
+    elif click_data and 'yaxis.range[0]' in click_data['relayoutData']:
+        sort_col = 'Aantal commissies als vast lid'
+    else:
+        sort_col = 'Aantal commissies als vast lid'
+
+    df_input = df_input.sort_values(by=sort_col, ascending=False)
+    # df_input = df_input.sort_values(by="Aantal commissies als vast lid", ascending=False)  # Sort by count
 
     data = [{
         "x": df_input['Parlementslid'],
@@ -307,6 +316,8 @@ def update_graph(df_input):
             "yaxis": {"title": "Aantal commissies als vast lid"},
         },
     }
+    
+
 
 # Define callback to update display based on selected commission and date range
 @app.callback(
@@ -323,9 +334,10 @@ def update_graph(df_input):
      , 
     [Input('dropdown_party', 'value'),
      Input('date-range', 'start_date'),
-     Input('date-range', 'end_date')]
+     Input('date-range', 'end_date'),
+     Input('permanent_comm_per_member_graph', 'clickData')]
 )
-def update_display(party_value, start_date, end_date):
+def update_display(party_value, start_date, end_date, clickData):
     # Filter df based on time frame
     filtered_df_overview, filtered_df_meetings = filter_data(
     start_date, end_date, party_value, 
@@ -333,28 +345,6 @@ def update_display(party_value, start_date, end_date):
     # ,
     # commission_value = "Alle commisises" # since no selection done on commissions, include all)
     )
-    
-    
-
-    
-    
-    # # update pie_chart
-    # pie_chart = update_pie_charts(filtered_df_overview)
-    
-    # # update table
-    # table = update_table(filtered_df_overview)
-    
-    # # update table_attendance_permanent
-    # table_attendance_permanent = update_attendance_permanent_members(filtered_df_overview, parlementsleden_all_dict)
-    
-    # # update variable of attendance_per_party
-    # attendance_per_party_percentage_df, attendance_per_party_percentage_df_formatted = update_attendance_per_party(filtered_df_overview, fracties_dict_input = fracties_dict)
-    
-    # # update of table of attendance_per_party
-    # attendance_per_party_percentage_table = update_table_indices(attendance_per_party_percentage_df_formatted)
-    
-    # # update graph of attendance_per_party
-    # attendance_per_party_percentage_graph = update_attendance_per_party_graph(attendance_per_party_percentage_df)
     
     # update dataframe of amount of permanent commissions per member
     grouped_by_count_df = amount_commissions_as_permanent(
@@ -370,7 +360,13 @@ def update_display(party_value, start_date, end_date):
         grouped_by_count_df_filtered = grouped_by_count_df[grouped_by_count_df["Partij"] == party_value]
     
     # update graph on permanent commissions per member
-    permanent_comm_per_member_graph = update_graph(df_input = grouped_by_count_df_filtered)
+    if clickData:
+        permanent_comm_per_member_graph = update_graph(df_input = grouped_by_count_df_filtered, click_data=clickData)
+    else:
+        permanent_comm_per_member_graph = update_graph(df_input = grouped_by_count_df_filtered)
+    
+    
+    
     
     # update table of amount of permanent commissions per member
     # permanent_comm_per_member_table = update_table(grouped_by_count_df) # use normal table
