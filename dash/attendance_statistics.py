@@ -135,3 +135,20 @@ def get_overall_presence(dataframe_attendance_column, fracties_dict):
                     party_counts[party] += count
                     break  # Stop iterating if the member is found in a party
     return dict(party_counts)
+    
+    
+def count_member_occurrence(attendance_list: list):
+    '''
+    Count how many members were present / absent / absent with notice for each of the relevant meetings.
+    '''
+    # Flatten the list of lists to count attendance over all meetings in the attendance list
+    # Skip empty cells that seemed to appear, as this is not informative.
+    flattened_attendance = [item for sublist in attendance_list for item in sublist if item != '']
+
+    # Count occurrences of members for all meetings represented in attandance_list
+    element_counts = Counter(flattened_attendance)
+    
+    # Sort elements by their counts in descending order
+    sorted_counts = sorted(element_counts.items(), key=lambda x: x[1], reverse=True)
+
+    return sorted_counts
