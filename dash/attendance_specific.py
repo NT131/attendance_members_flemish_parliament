@@ -1,6 +1,3 @@
-
-
-
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
@@ -12,6 +9,8 @@ import numpy as np
 import pandas as pd
 
 from datetime import datetime
+
+from collections import defaultdict
 
 import pickle
 
@@ -35,7 +34,6 @@ with open(f'../../data/parlementsleden.pkl', 'rb') as file:
     parlementsleden_all_dict = pickle.load(file)
 
 # Create a list of options for the dropdown
-dropdown_options_commission = [{"label": "Alle commissies", "value": "Alle commissies"}] + [{'label': item, 'value': item} for item in diff_commissions]
 dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}] + [{"label": party, "value": party} for party in fracties_dict.keys()] 
 
 # Build app
@@ -138,6 +136,18 @@ app.layout = html.Div(
                             ),
                         # Tabel met overzicht aantal commissies vast lid
                         # ...
+                        html.Div(
+                            className="table-container",
+                            children=[
+                                html.Div(
+                                    # Display the grouped_by_count_df_table
+                                    id='grouped_by_count_df_table',
+                                    className="table",
+                                    children=html.P("Tabel niet beschikbaar", style={"color": "red"}) # Initial content
+                                ),
+                            ]
+                        )
+                        
                     ]
                 ),
             ]
@@ -146,36 +156,23 @@ app.layout = html.Div(
 )
 
 
-#Define function to filter data based on user selection
-def filter_data(start_date, end_date, commission_value, 
-commissions_overview_df, meetings_all_commissions_df):   
+#Define function to filter data based on user selection (not possible to filter commissions_overview_df_input, meetings_all_commissions_df_input on party, so only filter on date)
+def filter_data(start_date, end_date, party_value, 
+commissions_overview_df_input, meetings_all_commissions_df_input):   
     # Ensure correct date format
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
 
-    # Filter i) the DataFrame with all commission meetings based on the commission dropdown value and
-    # ii) the overview dataframe based on the commission dropdown value
-    if commission_value == "Alle commissies":
-        meetings_all_commissions_filtered_df = meetings_all_commissions_df
-        commissions_overview_filtered_df = commissions_overview_df
-    else:
-        meetings_all_commissions_filtered_df = meetings_all_commissions_df[
-            meetings_all_commissions_df['commissie.titel'] == commission_value
-        ]
-        commissions_overview_filtered_df = commissions_overview_df[
-            commissions_overview_df['commissie.titel'] == commission_value
-        ]
-
     # Filter DataFrame with all commission meetings further based on the date range
-    meetings_all_commissions_filtered_df = meetings_all_commissions_filtered_df[
-        (meetings_all_commissions_filtered_df['Datum vergadering'] >= start_date) &
-        (meetings_all_commissions_filtered_df['Datum vergadering'] <= end_date)
+    meetings_all_commissions_filtered_df = meetings_all_commissions_df_input[
+        (meetings_all_commissions_df_input['Datum vergadering'] >= start_date) &
+        (meetings_all_commissions_df_input['Datum vergadering'] <= end_date)
     ]
     
     
     # Obtain for the filtered df the attendance statistics using imported function
     filtered_df_overview = attendance_statistics.obtain_attendance_statistics(
-    commissions_overview_df_input = commissions_overview_filtered_df, 
+    commissions_overview_df_input = commissions_overview_df_input, 
     meetings_all_commissions_df_input = meetings_all_commissions_filtered_df
     )
     
@@ -183,16 +180,85 @@ commissions_overview_df, meetings_all_commissions_df):
     return (filtered_df_overview, meetings_all_commissions_filtered_df)
 
 
+def amount_commissions_as_permanent(commissions_overview_df_input, 
+                                    parlementsleden_all_dict_input, 
+                                    fracties_dict_input):
+    """
+    Function to obtain an overview of how many commissions each member of parliament is a permanent member of.
+    """
+    
+     # Count how often a member occurs in the overview of lists of permanent members of commissions
+    amount_commissions_members = attendance_statistics.count_member_occurrence(commissions_overview_df_input['vaste leden'])
+    
+    
+    # Group members per amount of commissions
+    grouped_by_count = defaultdict(list)
+    # Grouping elements by their count
+    for name, count in amount_commissions_members:
+        grouped_by_count[count].append(name)
+
+
+    # Add members that are in no commissions at all (with count = 0)
+    # Obtain list of all member that are in at least 1 commission as permanent member
+    permanent_members = [name for names in grouped_by_count.values() for name in names]
+    # Obtain list of all members of parliament (i.e. including those not in any commission)
+    parlementsleden_list = [parlementsleden_all_dict[member_tuple][0] for member_tuple in parlementsleden_all_dict_input.keys()]
+    # Obtain list of all members of parliament that do not reside in any commission as permanent member
+    not_permanent_members = list(set(parlementsleden_list).difference(set(permanent_members)))
+    # Add members that are in no commission as permanent member to dict
+    grouped_by_count[0] = not_permanent_members
+    
+    
+    # Convert defaultdict to a list of tuples for DataFrame
+    grouped_by_count_list = [(name, count) for count, names in grouped_by_count.items() for name in names]
+    # Create DataFrame
+    grouped_by_count_df = pd.DataFrame(grouped_by_count,
+                                       columns=['Parlementslid', 'Aantal commissies als vast lid'])
+  
+  
+    # Creating a dictionary mapping members to their parties
+    member_to_party = {member[0]: party for party, members in fracties_dict_input.items() for member in members}
+    # Filling a list with the corresponding party of each member
+    parties_list = [member_to_party.get(member, 'Onbekend') for member in grouped_by_count_df['Parlementslid']]
+    # Add list of parties to dataframe
+    grouped_by_count_df["Partij"] = parties_list
+    
+    
+    # Drop index
+    grouped_by_count_df = grouped_by_count_df.reset_index(drop=True)
+    
+    
+    return grouped_by_count_df
+
+def update_table(df):
+   
+    # Create table header
+    table_header = [html.Tr([html.Th(col) for col in df.columns])]
+
+    # Create table rows using list comprehension
+    table_rows = [
+        html.Tr([html.Td(df.iloc[i][col]) for col in df.columns])
+        for i in range(len(df))
+    ]
+
+    # Assemble the complete table with header and rows
+    table = html.Table(table_header + table_rows, className='table')
+
+    return table  # Return a list containing the table element
+
+
 # Define callback to update display based on selected commission and date range
 @app.callback(
-    [
-    Output('pie-chart', 'figure'),
-    Output('attendance_per_party_percentage_table', 'children'),
-    Output('attendance_per_party_percentage_graph', 'figure')
+    # [
+    # Output('pie-chart', 'figure'),
+    Output('grouped_by_count_df_table', 'children')
+    # ,
+    # Output('attendance_per_party_percentage_graph', 'figure')
     # Output('table_attendance_permanent', 'children') # Update the children of 'table_attendance_permanent'
      # Output('table-container', 'children') # Update the children of 'table-container'
-     ], 
-    [Input('commissie-dropdown', 'value'),
+     # ]
+     , 
+    [Input('dropdown_party', 'value'),
      Input('date-range', 'start_date'),
      Input('date-range', 'end_date')]
 )
@@ -220,10 +286,16 @@ def update_display(commission_value, start_date, end_date):
     # # update graph of attendance_per_party
     # attendance_per_party_percentage_graph = update_attendance_per_party_graph(attendance_per_party_percentage_df)
     
+    # update dataframe of amount of permanent commissions per member
+    grouped_by_count_df = amount_commissions_as_permanent(
+                    commissions_overview_df_input = filtered_df_overview,
+                    parlementsleden_all_dict_input = parlementsleden_all_dict, 
+                    fracties_dict_input = fracties_dict)
     
-    return [pie_chart, attendance_per_party_percentage_table, attendance_per_party_percentage_graph]
-    #, table_attendance_permanent
-    # , table
+    # update table of amount of permanent commissions per member
+    grouped_by_count_df_table = update_table(grouped_by_count_df)
+    
+    return grouped_by_count_df_table
    
     
    
