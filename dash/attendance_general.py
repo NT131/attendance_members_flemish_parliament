@@ -14,9 +14,6 @@ import pickle
 
 import attendance_statistics # import functions of attendance_statistics.py (i.e. obtain_attendance_statistics() and helper functions)
 
-# # Load data of each meeting for each commission
-# with open(f'../../data/vergaderingen_commissies/overall_attendance_dict_2023-12-09.pkl', 'rb') as file:
-    # overall_attendance_dict = pickle.load(file)
 
 # Read in all meetings and attendance (both full (i.e. dict with party and id) and short (i.e. only name)
 meetings_all_commissions_df = pd.read_pickle('../../data/meetings_all_commissions_df_2023-12-12.pkl')
@@ -43,8 +40,7 @@ app = dash.Dash(__name__, assets_folder='assets') # Relative path to the folder 
 
 
 # Create the layout
-app.layout = html.Div(
-    
+app.layout = html.Div(  
     children=[
         # Header section
         html.Div(
@@ -67,21 +63,15 @@ app.layout = html.Div(
             className="section-header",
             style={"background-color": "#222222"} # Set dark background for this section
         ),
-        # Pie chart average attendance permanent members
+        # Gemiddelde aanwezigheid vaste leden in commissie + alle leden per partij
         html.Div(
             children=[
                 # Header
                 html.Div(
                     children=[
                         html.H2(
-                            "Gemiddelde aanwezigheid vaste leden in commissies",
+                            "Gemiddelde aanwezigheid vaste leden in commissie + alle leden per partij",
                             className="header-subtitle",
-                        ),
-                        html.P(
-                            children=(
-                                "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?"
-                            ),
-                            className="header-description",
                         ),
                     ],
                     className="section-header",
@@ -89,6 +79,10 @@ app.layout = html.Div(
                 # Selecting relevant data
                 html.Div(
                     children=[
+                        html.H3(
+                            "Selecteer de relevante commissie(s) en de periode.",
+                            className="header-subsubtitle",
+                        ),
                         # Dropdown to select commission
                         html.Div(
                             children=[
@@ -141,55 +135,76 @@ app.layout = html.Div(
                     ], 
                     className="section-chart",
                 ),
-                # Add pie chart
-                html.Div([
-                    dcc.Graph(id='pie-chart'),
-                    # Add a dummy component to trigger the update
-                    html.Div(id='dummy-trigger', style={'display': 'none'})
-                    ]
-                ),
-            ],
-            className="section-chart",
-        ),
-        
-        
-        # Attendance of commissions per party
-        html.Div(
-            children=[
+                # "Gemiddelde aanwezigheid vaste leden in commissies"
                 html.Div(
                     children=[
-                        html.H2(
-                            "Aanwezigheidsgegevens van parlementsleden per partij",
-                            className="header-subtitle",
-                        ),
-                        html.P(
-                            children=(
-                                "Welke partij woonde het meest frequent vergaderingen van commissies bij?"
-                            ),
-                            className="header-description",
-                        ),
-                    ],
-                    className="section-header",
-                ),
-                # Display attendance_per_party_graph
-                html.Div([
-                    dcc.Graph(id='attendance_per_party_percentage_graph')
-                    ]
-                ),
-                html.Div(
-                    className="table-container",
-                    children=[
+                        # Header
                         html.Div(
-                            # Display the attendance_per_party_percentage_table
-                            id='attendance_per_party_percentage_table',
-                            className="table",
-                            children=html.P("Tabel niet beschikbaar", style={"color": "red"})
+                            children=[
+                                html.H3(
+                                    "Gemiddelde aanwezigheid vaste leden in commissies",
+                                    className="header-subsubtitle",
+                                ),
+                                html.P(
+                                    children=(
+                                        "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?"
+                                    ),
+                                    className="header-description",
+                                ),
+                            ],
+                            className="section-header",
+                            ),
+                        # Pie chart
+                        html.Div([
+                            dcc.Graph(id='pie-chart'),
+                            # Add a dummy component to trigger the update
+                            html.Div(id='dummy-trigger', style={'display': 'none'})
+                            ]
                         ),
-                    ]
-                )
+                     ]
+                ),       
+                # Attendance of commissions per party
+                html.Div(
+                    children=[
+                        # Header
+                        html.Div(
+                            children=[
+                                html.H3(
+                                    "Aanwezigheidsgegevens van parlementsleden per partij",
+                                    className="header-subsubtitle",
+                                ),
+                                html.P(
+                                    children=(
+                                        "Welke partij woonde het meest frequent vergaderingen van commissies bij?"
+                                    ),
+                                    className="header-description",
+                                ),
+                            ],
+                            className="section-header",
+                        ),
+                        # Graph attendance_per_party
+                        html.Div([
+                            dcc.Graph(id='attendance_per_party_percentage_graph')
+                            ]
+                        ),
+                        # Table attendance_per_party
+                        html.Div(
+                            className="table-container",
+                            children=[
+                                html.Div(
+                                    # Display the attendance_per_party_percentage_table
+                                    id='attendance_per_party_percentage_table',
+                                    className="table",
+                                    children=html.P("Tabel niet beschikbaar", style={"color": "red"})
+                                ),
+                            ]
+                        )
+                    ],
+                ),
             ],
             className="wrapper",
         ),
+
         
         
         

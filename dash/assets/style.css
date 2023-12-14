@@ -37,6 +37,14 @@ body {
     margin: 10px auto; /* Adjust margin for subtitle */
 }
 
+/* Style for the subtitle */
+.header-subsubtitle {
+    font-family: 'Lato', sans-serif;
+    color: #666666; /* Adjust color for subtitle */
+    font-size: 20px; /* Adjust font size for subtitle */
+    text-align: center;
+    margin: 10px auto; /* Adjust margin for subtitle */
+}
 
 .header-description {
 	font-family: 'Lato', sans-serif;
@@ -67,7 +75,7 @@ body {
     height: 180px;  /* Extend if need be, e.g. when expanding amount of menus*/
     width: 912px;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-evenly; 
     padding-top: 24px;
     margin: -80px auto 0 auto;
     background-color: #FFFFFF;
