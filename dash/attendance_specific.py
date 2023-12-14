@@ -1,6 +1,7 @@
 import dash
-from dash import dcc, html
+from dash import dcc, html, dash_table # import dash_table to allow dynamically sorting tables
 from dash.dependencies import Input, Output
+
 # import plotly.express as px
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
@@ -33,8 +34,22 @@ with open(f'../../data/fracties.pkl', 'rb') as file:
 with open(f'../../data/parlementsleden.pkl', 'rb') as file:
     parlementsleden_all_dict = pickle.load(file)
 
+# # Use colours obtained from website: manual insertion or reading in dict
+party_colors = {'Groen': '83de62',
+    'Onafhankelijke': '787878',
+    'Vooruit': 'FF2900',
+    'Vlaams Belang': 'ffe500',
+    'cd&v': 'f5822a',
+    'N-VA': 'ffac12',
+    'Open Vld': '003d6d',
+    'PVDA': 'AA050E'
+ }
+
+
 # Create a list of options for the dropdown
 dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}] + [{"label": party, "value": party} for party in fracties_dict.keys()] 
+
+
 
 # Build app
 app = dash.Dash(__name__, assets_folder='assets') # Relative path to the folder of css file)
@@ -134,31 +149,38 @@ app.layout = html.Div(
                             ],
                             className="section-header",
                             ),
+                        # Graph with amount of commissions as permanent member
+                        html.Div(
+                            children=dcc.Graph(
+                                id="permanent_comm_per_member_graph",
+                            ),
+                            className="card",
+                        ),
                         # Tabel met overzicht aantal commissies vast lid
-                        # ...
                         html.Div(
                             className="table-container",
                             children=[
                                 html.Div(
-                                    # Display the grouped_by_count_df_table
-                                    id='grouped_by_count_df_table',
-                                    className="table",
+                                    # Display the permanent_comm_per_member_table
+                                    id='permanent_comm_per_member_table',
+                                    className="dash-table",
                                     children=html.P("Tabel niet beschikbaar", style={"color": "red"}) # Initial content
                                 ),
                             ]
-                        )
-                        
+                        ),
                     ]
                 ),
-            ]
+            ],
+            className="wrapper",
         ),
     ]
 )
 
 
 #Define function to filter data based on user selection (not possible to filter commissions_overview_df_input, meetings_all_commissions_df_input on party, so only filter on date)
-def filter_data(start_date, end_date, party_value, 
-commissions_overview_df_input, meetings_all_commissions_df_input):   
+def filter_data(start_date, end_date, party_value,
+                commissions_overview_df_input, 
+                meetings_all_commissions_df_input):   
     # Ensure correct date format
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
@@ -212,7 +234,7 @@ def amount_commissions_as_permanent(commissions_overview_df_input,
     # Convert defaultdict to a list of tuples for DataFrame
     grouped_by_count_list = [(name, count) for count, names in grouped_by_count.items() for name in names]
     # Create DataFrame
-    grouped_by_count_df = pd.DataFrame(grouped_by_count,
+    grouped_by_count_df = pd.DataFrame(grouped_by_count_list,
                                        columns=['Parlementslid', 'Aantal commissies als vast lid'])
   
   
@@ -220,8 +242,8 @@ def amount_commissions_as_permanent(commissions_overview_df_input,
     member_to_party = {member[0]: party for party, members in fracties_dict_input.items() for member in members}
     # Filling a list with the corresponding party of each member
     parties_list = [member_to_party.get(member, 'Onbekend') for member in grouped_by_count_df['Parlementslid']]
-    # Add list of parties to dataframe
-    grouped_by_count_df["Partij"] = parties_list
+    # Add list of parties to dataframe as second column (i.e. right after member name)
+    grouped_by_count_df.insert(1, "Partij", parties_list)
     
     
     # Drop index
@@ -246,27 +268,75 @@ def update_table(df):
 
     return table  # Return a list containing the table element
 
+def update_dash_table(df, set_id: str):
+    table = dash_table.DataTable(
+        id=set_id,
+        columns=[{'name': col, 'id': col} for col in df.columns], # use columns of dataframe as table columns
+        data=df.to_dict('records'), # use dataframe records to populate data
+        sort_action='native',  # Enable sorting
+        style_table={'overflowX': 'auto'},  # Enable horizontal scroll
+        # Add any additional styling or properties as needed
+    )
+
+    return table
+    
+def update_graph(df_input):
+    # if selected_party == "Alle partijen":
+        # df_filtered = df_input.copy()
+    # else:
+        # df_filtered = df_input[df_input["Partij"] == selected_party]  
+
+    df_input = df_input.sort_values(by="Aantal commissies als vast lid", ascending=False)  # Sort by count
+
+    data = [{
+        "x": df_input['Parlementslid'],
+        "y": df_input['Aantal commissies als vast lid'],
+        "type": "bar",
+        "marker": {"color": [party_colors.get(party, "grey") for party in df_input['Partij']]},  # Set color based on party
+        "hovertemplate": "<b>%{x}</b><br>"
+                         "Partij: %{text}<br>"
+                         "Aantal commissies als vast lid: %{y}<extra></extra>",
+        "text": ['' for _ in df_input["Partij"]],  # Empty string to remove label on bars
+    }]
+
+    return {
+        "data": data,
+        "layout": {
+            "title": "Aantal commissies als vast lid per parlementslid",
+            "xaxis": {"title": "Parlementslid", "tickangle": -45, "tickfont": {"size": 10}, "automargin": True},
+            "yaxis": {"title": "Aantal commissies als vast lid"},
+        },
+    }
 
 # Define callback to update display based on selected commission and date range
 @app.callback(
-    # [
+    [
     # Output('pie-chart', 'figure'),
-    Output('grouped_by_count_df_table', 'children')
+    Output('permanent_comm_per_member_graph', 'figure')
+    ,
+    Output('permanent_comm_per_member_table', 'children')
     # ,
     # Output('attendance_per_party_percentage_graph', 'figure')
     # Output('table_attendance_permanent', 'children') # Update the children of 'table_attendance_permanent'
      # Output('table-container', 'children') # Update the children of 'table-container'
-     # ]
+     ]
      , 
     [Input('dropdown_party', 'value'),
      Input('date-range', 'start_date'),
      Input('date-range', 'end_date')]
 )
-def update_display(commission_value, start_date, end_date):
-    # Filter df based on user input
+def update_display(party_value, start_date, end_date):
+    # Filter df based on time frame
     filtered_df_overview, filtered_df_meetings = filter_data(
-    start_date, end_date, commission_value,
-    commissions_overview_df, meetings_all_commissions_df)
+    start_date, end_date, party_value, 
+    commissions_overview_df, meetings_all_commissions_df
+    # ,
+    # commission_value = "Alle commisises" # since no selection done on commissions, include all)
+    )
+    
+    
+
+    
     
     # # update pie_chart
     # pie_chart = update_pie_charts(filtered_df_overview)
@@ -292,10 +362,26 @@ def update_display(commission_value, start_date, end_date):
                     parlementsleden_all_dict_input = parlementsleden_all_dict, 
                     fracties_dict_input = fracties_dict)
     
-    # update table of amount of permanent commissions per member
-    grouped_by_count_df_table = update_table(grouped_by_count_df)
+
     
-    return grouped_by_count_df_table
+    if party_value == "Alle partijen":
+        grouped_by_count_df_filtered = grouped_by_count_df.copy()
+    else:
+        grouped_by_count_df_filtered = grouped_by_count_df[grouped_by_count_df["Partij"] == party_value]
+    
+    # update graph on permanent commissions per member
+    permanent_comm_per_member_graph = update_graph(df_input = grouped_by_count_df_filtered)
+    
+    # update table of amount of permanent commissions per member
+    # permanent_comm_per_member_table = update_table(grouped_by_count_df) # use normal table
+    permanent_comm_per_member_table = update_dash_table(df = grouped_by_count_df_filtered, set_id =  "grouped_by_count_df_table") # use dash table
+    
+    # print("relevant parties: ", party_value)
+    # print(grouped_by_count_df_table)
+    
+    
+    
+    return [permanent_comm_per_member_graph, permanent_comm_per_member_table]
    
     
    

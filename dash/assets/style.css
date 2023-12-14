@@ -152,6 +152,51 @@ body {
     background-color: #f5f5f5; /* Lighter color on hover */
 }
 
+/* Style for the table */
+.dash-table {
+    font-family: 'Lato', sans-serif;
+    width: 100%;
+    table-layout: auto; /* Adjusts column width based on content */
+    border-collapse: collapse;
+}
+
+/* Style for table header */
+.dash-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px; /* Increased padding for header */
+    border-bottom: 2px solid #ddd; /* Adding a bottom border for separation */
+}
+
+/* Alternate row colors for better readability */
+.dash-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style for table cells */
+.dash-table td {
+    border: 1px solid #ddd; /* Slight lighter border color */
+    text-align: left;
+    padding: 10px; /* Adjusted cell padding */
+    white-space: nowrap; /* Prevents word wrapping */
+}
+
+/* /* Align the last three columns to the right */ */
+/* .dash-table td:nth-last-child(-n+3) { */
+    /* text-align: right; */
+/* } */
+
+/* /* Align the last eight columns to the right */ */
+/* .dash-table td:nth-last-child(-n+8) { */
+    /* text-align: right; */
+/* } */
+
+/* Hover effect for better interactivity */
+.dash-table tr:hover {
+    background-color: #f5f5f5; /* Lighter color on hover */
+}
+
 /* Section for the header */
 .section-header {
     font-family: 'Lato', sans-serif;
