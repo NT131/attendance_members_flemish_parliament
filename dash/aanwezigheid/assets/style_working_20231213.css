@@ -1,0 +1,183 @@
+ /* ../dash\aanwezigheid\assets */
+
+body {
+    font-family: "Lato", sans-serif;
+    margin: 0;
+    background-color: #F7F7F7;
+}
+
+.header {
+	font-family: 'Lato', sans-serif;
+    background-color: #222222;
+    height: 288px;
+    padding: 16px 0 0 0;
+}
+
+.header-emoji {
+    font-size: 48px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.header-title {
+	font-family: 'Lato', sans-serif;
+    color: #FFFFFF;
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.header-description {
+	font-family: 'Lato', sans-serif;
+    color: #CFCFCF;
+    margin: 4px auto;
+    text-align: center;
+    max-width: 384px;
+}
+
+.wrapper {
+	font-family: 'Lato', sans-serif;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1024px;
+    padding-right: 10px;
+    padding-left: 10px;
+    margin-top: 32px;
+}
+
+.card {
+	font-family: 'Lato', sans-serif;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.menu {
+	font-family: 'Lato', sans-serif;
+    height: 180px;  /* Extend if need be, e.g. when expanding amount of menus*/
+    width: 912px;
+    display: flex;
+    justify-content: space-evenly;
+    padding-top: 24px;
+    margin: -80px auto 0 auto;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.Select-control {
+    width: 256px;
+    height: 48px;
+}
+
+.Select--single>.Select-control .Select-value,
+.Select-placeholder {
+    line-height: 48px;
+}
+
+.Select--multi .Select-value-label {
+    line-height: 32px;
+}
+
+.menu-title {
+	font-family: 'Lato', sans-serif;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #079A82;
+}
+
+/* Style for the table */
+.table {
+	font-family: 'Lato', sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+	table-layout: auto; /* Adjusts column width based on content */
+}
+
+/* Style for table header */
+.table th {
+	font-family: 'Lato', sans-serif;
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: left;
+    padding: 8px;
+	
+}
+
+/* Alternate row colors for better readability */
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style for table cells */
+.table td {
+	font-family: 'Lato', sans-serif;
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+	white-space: nowrap; /* Prevents word wrapping */
+}
+
+/* Align the last three columns to the right */
+.table td:nth-last-child(-n+3) {
+    text-align: right;
+}
+
+/* Section for the header */
+.section-header {
+    font-family: 'Lato', sans-serif;
+    background-color: #222222;
+    /* height: 150px; */
+    padding: 16px 16px 16px 16px; /*ensure padding of text, instead of fixed height setting */
+}
+
+.section-header .header-title {
+    color: #FFFFFF;
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.section-header .header-description {
+    color: #CFCFCF;
+    margin: 4px auto;
+    text-align: center;
+    max-width: 884px;
+}
+
+/* Section for the pie chart and filters */
+.section-chart {
+    font-family: 'Lato', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+    margin-top: 10px; /* Adjust this margin to move the chart box closer to the menu */
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+/* Set margins for box holding dropdowns */
+.section-chart .menu-element {
+    margin-bottom: 20px;
+	margin-top: 20px;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+/* Set settings for menu titles */
+.section-chart .menu-element .menu-title {
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #079A82;
+}
+
+/* Set dimensions of dropdowns */
+.section-chart .menu-element .dropdown .Select-control {
+    min-width: 800px; /* Adjust the minimum width for the dropdown when active */
+    width: auto; /* Reset fixed width */
+	min-height: 38px; /* Allow the height to adjust based on content */
+    height: auto; /* Reset the fixed height */
+}
+
+

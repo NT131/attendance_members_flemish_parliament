@@ -1,0 +1,11 @@
+dash==2.14.2
+numpy
+pandas
+#csv
+#pickle
+#collections
+#requests
+#datetime
+#locale
+#collections
+#matplotlib
