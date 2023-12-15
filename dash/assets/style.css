@@ -254,5 +254,9 @@ body {
 	min-height: 38px; /* Allow the height to adjust based on content */
     height: auto; /* Reset the fixed height */
 }
+/* Ensure graph titles in pie charts are wrapped */
+.graph-title {
+    word-wrap: break-word;
+}
 
 
