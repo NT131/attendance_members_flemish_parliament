@@ -303,9 +303,10 @@ def update_graph(df_input, click_data=None):
         "type": "bar",
         "marker": {"color": [party_colors.get(party, "grey") for party in df_input['Partij']]},  # Set color based on party
         "hovertemplate": "<b>%{x}</b><br>"
-                         "Partij: %{text}<br>"
-                         "Aantal commissies als vast lid: %{y}<extra></extra>",
-        "text": ['' for _ in df_input["Partij"]],  # Empty string to remove label on bars
+                     "Partij: %{customdata}<br>"
+                     "Aantal commissies als vast lid: %{y}<extra></extra>",
+        "customdata": df_input["Partij"],  # Include 'Partij' column as custom data for hover label
+
     }]
 
     return {
