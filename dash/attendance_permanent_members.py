@@ -261,7 +261,7 @@ def obtain_attendance_permanent_members(commissions_overview_df_input, fracties_
                                                            'Percentage vergaderingen aanwezig',
                                                            'Aantal commissies waarin vast lid'],
                                             index = list(all_permanent_members))
-    # Convert the percentage column to float to avoid later error messages
+    # Convert the percentage column to float to avoid later errors
     member_amount_meetings_pd['Percentage vergaderingen aanwezig'] = member_amount_meetings_pd['Percentage vergaderingen aanwezig'].astype(float)
     #Iterate over all permanent members of parliament
     for index_members, row_members in member_amount_meetings_pd.iterrows():
