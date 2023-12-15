@@ -1,7 +1,7 @@
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
-# import plotly.express as px
+
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
