@@ -3,7 +3,7 @@ from dash import dcc, html, dash_table # import dash_table to allow dynamically 
 from dash.dependencies import Input, Output
 import pandas as pd
 
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 # import plotly.graph_objs as go
 # from plotly.subplots import make_subplots
@@ -131,9 +131,16 @@ app.layout = html.Div(
         html.Div(
             children=[
                 html.Div(
-                    # Graph of the average attendance per member
+                    # Graph of the average attendance per permanent member
                     children=dcc.Graph(
-                        id="member_amount_meetings_df_graph",
+                        id="permanent_member_amount_meetings_df_graph",
+                    ),
+                    className="card",
+                ),
+                html.Div(
+                    # Graph of the average attendance per non-permanent member
+                    children=dcc.Graph(
+                        id="non_permanent_member_amount_meetings_df_graph",
                     ),
                     className="card",
                 ),
@@ -303,6 +310,96 @@ def obtain_attendance_permanent_members(commissions_overview_df_input, fracties_
     return member_amount_meetings_pd
 
 
+def obtain_attendance_non_permanent_members(commissions_overview_df_input, 
+                                            parlementsleden_all_dict_input,
+                                            fracties_dict_input):
+    """
+    We obtain aggregated counts per member over all commissions in which they
+    were no permanent member, to get overall totals per member how often they
+    had a certain attendance     status (e.g. 'Aanwezig', 'Afwezig', 'Verontschuldigd'), 
+    using a helper function `obtain_aggregated_counts()`.
+    """
+    # Obtaining actual aggregated counts for how often members were present
+    aanwezig_per_lid_alle = attendance_statistics.obtain_aggregated_counts(commissions_overview_df_input['aanwezig_count_alle'])
+    # Set member names as index (to allow easier processing later on)
+    aanwezig_per_lid_alle = aanwezig_per_lid_alle.set_index("Member")
+    
+    
+    # Then we obtain a list of all members of parliament, to compare them with the attendance data.
+    alle_parlementsleden_list = [parlementsleden_all_dict_input[member_tuple][0] for member_tuple in parlementsleden_all_dict_input.keys()]
+    
+    
+    # Obtain list of all members of parliament that have never attended a commission
+    all_members_never_present = [element for element in alle_parlementsleden_list if element not in aanwezig_per_lid_alle.index]
+
+    
+    # Then we obtain for each commission a list of members that have attended meetings of that commission although they are no permanent member of that commission.
+    members_present_but_no_permanent_overall = [] # Create empty list to fill
+    # Iterate over each commission
+    for index_overview, row_overview in commissions_overview_df_input.iterrows():
+        permanent_members = row_overview["vaste leden"] # Obtain permanent members of commission
+        # Obtain list of all members that have been present at at least 1 meeting of this commission
+        members_present_in_meetings = [member_tuple[0] for member_tuple in row_overview["aanwezig_count_alle"]]
+        # Obtain subset of those members that are no permanent members
+        members_present_but_no_permanent = [member for member in members_present_in_meetings if member not in permanent_members]
+        # Append this subset to the overall list
+        members_present_but_no_permanent_overall.append(members_present_but_no_permanent)
+      
+    
+    # Then we obtain for each of those non-permanent members how often they were present at a specific commission.
+    count_members_present_but_not_permanent_overall = []
+    for index, spec_commission_attendance_list in enumerate(commissions_overview_df_input['aanwezig_count_alle']):
+        count_members_present_but_not_permanent = [member_tuple for member_tuple in spec_commission_attendance_list if member_tuple[0] in members_present_but_no_permanent_overall[index]]
+        count_members_present_but_not_permanent_overall.append(count_members_present_but_not_permanent)
+    # Append resulting list as new column to overview data frame 
+    commissions_overview_df_input["aanwezig_count_alle_maar_geen_vast_lid"] = count_members_present_but_not_permanent_overall
+        
+        
+    # Obtaining actual aggregated counts for how often members were present
+    aanwezig_per_lid_alle_maar_niet_vast_df = attendance_statistics.obtain_aggregated_counts(count_members_present_but_not_permanent_overall)
+    # Use member name as index
+    aanwezig_per_lid_alle_maar_niet_vast_df = aanwezig_per_lid_alle_maar_niet_vast_df.set_index('Member')
+
+    
+    # Then we add the party the dataframe, using the earlier defined helper function.
+    parties_list = []
+    for member in aanwezig_per_lid_alle_maar_niet_vast_df.index:
+        party = attendance_statistics.find_member(fracties_dict_input, member)
+        parties_list.append(party)
+    aanwezig_per_lid_alle_maar_niet_vast_df["Partij"] = parties_list
+    
+    
+    # We also add in how many additional commissions they were present.
+    aanwezig_per_lid_alle_maar_niet_vast_df["Aantal commissies extra aanwezig"] = 0
+    # Flatten list of attendance (including counts)
+    flattened_attendance_list = [item for sublist in commissions_overview_df_input["aanwezig_count_alle_maar_geen_vast_lid"] for item in sublist]
+    # Maintain only names and not counts
+    flattened_attendance_list = [item[0] for item in flattened_attendance_list]
+    # Count occurrences of members for all meetings represented in attandance_list
+    amount_of_meetings_counter = Counter(flattened_attendance_list)
+    # Sort elements by their counts in descending order
+    amount_of_meetings_list = sorted(amount_of_meetings_counter.items(), key=lambda x: x[1], reverse=True)
+    for member_name, count in amount_of_meetings_counter.items():
+        aanwezig_per_lid_alle_maar_niet_vast_df.at[member_name, "Aantal commissies extra aanwezig"] = count
+    
+    
+    # Finally we also add for each member in how many commissions they are a permanent member.
+    aanwezig_per_lid_alle_maar_niet_vast_df["Aantal commissies waarin vast lid"] = 0 # Initialize new column
+    # Create flattened list of all permanent member accross all commissions
+    flattened_permanent_members = [item for sublist in commissions_overview_df_input['vaste leden'] for item in sublist]
+    # Count occurrences of meetings for which member is permanent member
+    amount_of_meetings_as_permanent_counter = Counter(flattened_permanent_members)
+    #Store counts in column '"Aantal commissies waarin vast lid"'
+    for member_name, count in amount_of_meetings_as_permanent_counter.items():
+        if member_name in aanwezig_per_lid_alle_maar_niet_vast_df.index:
+            aanwezig_per_lid_alle_maar_niet_vast_df.at[member_name, "Aantal commissies waarin vast lid"] = count
+
+
+    # Rename column "Aggregated_Count" to "Aantal vergaderingen aanwezig"
+    aanwezig_per_lid_alle_maar_niet_vast_df = aanwezig_per_lid_alle_maar_niet_vast_df.rename(columns={"Aggregated_Count": "Aantal vergaderingen aanwezig"})
+    
+    
+    return aanwezig_per_lid_alle_maar_niet_vast_df
     
 
 def update_dash_table(df, set_id: str):
@@ -353,8 +450,9 @@ def update_graph_bar(df_input):
 
     return figure
 
-# Create scatter plot
-def update_graph_scatter(df_input):
+
+# Create scatter plot for permanent members
+def update_graph_scatter_permanent(df_input):
     hover_text = (
         df_input.apply(
             lambda row: (
@@ -363,7 +461,7 @@ def update_graph_scatter(df_input):
                 f"{row['Aantal vergaderingen aanwezig']} keer aanwezig, "
                 f"{row['Aantal vergaderingen afwezig']} keer afwezig en "
                 f"{row['Aantal vergaderingen verontschuldigd']} keer verontschuldigd. <br>"
-                f"Dat brengt het aanwezigheidspercentage op {row['Percentage vergaderingen aanwezig']:.1%}.<br><br>"
+                f"Dat brengt het aanwezigheidspercentage op <b>{row['Percentage vergaderingen aanwezig']:.1%}</b>.<br><br>"
                 f"Zetelt als vast lid in {row['Aantal commissies waarin vast lid']} commissie(s)."
             ),
             axis=1,
@@ -395,18 +493,66 @@ def update_graph_scatter(df_input):
         customdata=hover_text,
     )
     
-    print(df_input['Aantal commissies waarin vast lid'])
+    fig.update_layout(
+        xaxis=dict(
+            tickformat=".0%",  # Format y-axis as percentage without decimal
+            title="Percentage vergaderingen aanwezig",
+        ),
+    )
+    
+    # print(df_input['Aantal commissies waarin vast lid'])
     
     return fig
 
+# Create scatter plot for non-permanent members
+def update_graph_scatter_non_permanent(df_input):
+    hover_text = (
+        df_input.apply(
+            lambda row: (
+                f"<b>{row.name}</b> was in de huidige periode <b> {row['Aantal vergaderingen aanwezig']} </b> keer aanwezig <br>"
+                f"op vergaderingen van commissies waarvan deze geen vast lid is. <br><br>"
+                f"Zetelt als vast lid in {row['Aantal commissies waarin vast lid']} commissie(s)."
+            ),
+            axis=1,
+        )
+    )
 
+    fig = px.scatter(
+        df_input,
+        x="Aantal vergaderingen aanwezig",
+        y="Partij",
+        color='Partij',
+        # color=[
+            # party_colors[value]
+            # if not pd.isna(value)
+            # else "#CCCCCC"
+            # for value in df_input["Partij"].iloc
+        # ],
+        size="Aantal commissies waarin vast lid",
+        custom_data=["Partij"],  # Include party name in custom data for hover label
+        title="Aanwezigheid parlementsleden in commissies waarin ze geen vast lid zijn",
+        color_discrete_map=party_colors,  # Define colors for parties
+        # size_max=30,  # Adjust the maximum size of the bubbles
+    )
+
+    fig.update_traces(
+        hovertemplate=(
+            "%{customdata}<br><extra></extra>"
+        ),
+        customdata=hover_text,
+    )
+    
+    # print(df_input['Aantal commissies waarin vast lid'])
+    
+    return fig
 
 # Update display
 @app.callback(
-    # [
-        Output("member_amount_meetings_df_graph", "figure"),
+    [
+        Output("permanent_member_amount_meetings_df_graph", "figure"),
+        Output("non_permanent_member_amount_meetings_df_graph", "figure"),
         # Output("member_amount_meetings_df_table", "children")
-    # ],
+    ],
     [
         Input("party-dropdown", "value"),
         Input('date-range', 'start_date'),
@@ -423,23 +569,33 @@ def update_display(party_value, start_date, end_date):
     name2count_permanent_dict = amount_commissions_as_permanent_dict(filtered_df_overview,
                                                                     parlementsleden_all_dict,fracties_dict)
     
-    # Obtain aggregated counts of attendance (present, absent, absent with notice) for each member
-    member_amount_meetings_df = obtain_attendance_permanent_members(filtered_df_overview, fracties_dict, name2count_permanent_dict)
+    # Obtain aggregated counts of attendance (present, absent, absent with notice) for each permanent member
+    permanent_member_amount_meetings_df = obtain_attendance_permanent_members(filtered_df_overview, fracties_dict, name2count_permanent_dict)
     
-    # Filter member_amount_meetings_df on selected party
+    non_permanent_member_amount_meetings_df = obtain_attendance_non_permanent_members(
+            filtered_df_overview, parlementsleden_all_dict, fracties_dict)
+    
+    # Filter permanent_member_amount_meetings_df & non_permanent_member_amount_meetings_df on selected party
     if party_value == "Alle partijen":
-        member_amount_meetings_df_filtered = member_amount_meetings_df
+        permanent_member_amount_meetings_df = permanent_member_amount_meetings_df
+        non_permanent_member_amount_meetings_df = non_permanent_member_amount_meetings_df
+        
     else:
-        member_amount_meetings_df_filtered = member_amount_meetings_df[member_amount_meetings_df["Partij"] == party_value]
+        permanent_member_amount_meetings_df = permanent_member_amount_meetings_df[permanent_member_amount_meetings_df["Partij"] == party_value]
+        non_permanent_member_amount_meetings_df = non_permanent_member_amount_meetings_df[non_permanent_member_amount_meetings_df["Partij"] == party_value]
     
     # Turn attendance data in graph
-    # member_amount_meetings_df_graph = update_graph_bar(member_amount_meetings_df_filtered) # bar graph
-    member_amount_meetings_df_graph = update_graph_scatter(member_amount_meetings_df_filtered) # scatter graph
+    # permanent_member_amount_meetings_df_graph = update_graph_bar(permanent_member_amount_meetings_df) # bar graph
+    permanent_member_amount_meetings_df_graph = update_graph_scatter_permanent(permanent_member_amount_meetings_df) # scatter graph
+    
+    # non_permanent_member_amount_meetings_df_graph = update_graph_bar(non_permanent_member_amount_meetings_df) # bar graph
+    non_permanent_member_amount_meetings_df_graph = update_graph_scatter_non_permanent(non_permanent_member_amount_meetings_df) # scatter graph
     
     # # Turn attendance data in dash table
-    # member_amount_meetings_df_table = update_dash_table(member_amount_meetings_df_filtered, "member_amount_meetings_df_table")
+    # permanent_member_amount_meetings_df_table = update_dash_table(permanent_member_amount_meetings_df, "permanent_member_amount_meetings_df_table")
+    # member_amount_meetings_df_table = update_dash_table(non_permanent_member_amount_meetings_df_graph, "non_permanent_member_amount_meetings_df_table")
     
-    return member_amount_meetings_df_graph
+    return permanent_member_amount_meetings_df_graph, non_permanent_member_amount_meetings_df_graph
     # , member_amount_meetings_df_table
 
 
