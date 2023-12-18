@@ -194,7 +194,6 @@ commissions_overview_df_input, meetings_all_commissions_df_input):
     meetings_all_commissions_df_input = meetings_all_commissions_filtered_df
     )
     
-    # print(filtered_df_overview)
     return (filtered_df_overview, meetings_all_commissions_filtered_df)
 
 
@@ -244,10 +243,15 @@ def obtain_attendance_permanent_members(commissions_overview_df_input, fracties_
     """
     We obtain aggregated counts per member over all commissions, to get overall totals per member how often they had a certain attendance status (e.g. 'Aanwezig', 'Afwezig', 'Verontschuldigd'), using a helper function `obtain_aggregated_counts()`.
     """
-    # Obtaining actual aggregated counts for how often permanent members were present
-    aanwezig_per_lid = attendance_statistics.obtain_aggregated_counts(commissions_overview_df_input['aanwezig_count_vaste'])
+    # Obtaining actual aggregated counts for how often permanent members were present / absent / absent with notice + rename output column 'Aggregate_Count" to more insightful name + to avoid duplicates)
+    aanwezig_per_lid = attendance_statistics.obtain_aggregated_counts(commissions_overview_df_input['aanwezig_count_vaste']).rename(columns={"Aggregated_Count": "Aantal vergaderingen aanwezig"})
+    afezig_per_lid = attendance_statistics.obtain_aggregated_counts(commissions_overview_df_input['afwezig_count_vaste']).rename(columns={"Aggregated_Count": "Aantal vergaderingen afwezig"})
+    verontschuldigd_per_lid = attendance_statistics.obtain_aggregated_counts(commissions_overview_df_input['verontschuldigd_count_vaste']).rename(columns={"Aggregated_Count": "Aantal vergaderingen verontschuldigd"})
+    #Merge those dfs, using 'Member' column as identifier
+    merged_df = pd.merge(aanwezig_per_lid, afezig_per_lid,  on="Member", how="outer")
+    merged_df = pd.merge(merged_df, verontschuldigd_per_lid,  on="Member", how="outer") 
     # Set member names as index (to allow easier processing later on)
-    aanwezig_per_lid = aanwezig_per_lid.set_index("Member")
+    aanwezigheid_per_lid_df = merged_df.set_index("Member")
 
     # There seems to be some members present in `all_permanent_members` (which is based on `commissions_overview_df['vaste leden']`) that are not present in `aanwezig_per_lid` (which is based on `commissions_overview_df['aanwezig_count_vaste']`). We assess which these are, and add them to the `aanwezig_per_lid` dataframe, with count 0.
     # Obtain list of all members of parliament that reside in commissions as permanent member
@@ -255,59 +259,47 @@ def obtain_attendance_permanent_members(commissions_overview_df_input, fracties_
     for member_list in commissions_overview_df_input['vaste leden']:
         all_permanent_members.update(member_list)
     # Obtain list of all members of parliament that do not reside in any commission as permanent member
-    permanent_members_never_present = [element for element in all_permanent_members if element not in aanwezig_per_lid.index]
-    # Add those members to the dataframe, with a count of 0
+    permanent_members_never_present = [element for element in all_permanent_members if element not in aanwezigheid_per_lid_df.index]
+    # Add those members to the dataframe, with counts of 0
     for member in permanent_members_never_present:
-        aanwezig_per_lid.loc[member] = 0
+        aanwezigheid_per_lid_df.loc[member] = 0
         
-    #Create empty dataframe with permanent members, fill with zero (i.e. starting count) and use parmanent members as index
-    member_amount_meetings_pd = pd.DataFrame(0, columns = ['Aantal relevante vergaderingen',
-                                                           'Aantal vergaderingen aanwezig',
-                                                           'Aantal vergaderingen afwezig',
-                                                           'Aantal vergaderingen verontschuldigd',
-                                                           'Percentage vergaderingen aanwezig',
-                                                           'Aantal commissies waarin vast lid'],
-                                            index = list(all_permanent_members))
-    # Convert the percentage column to float to avoid later errors
-    member_amount_meetings_pd['Percentage vergaderingen aanwezig'] = member_amount_meetings_pd['Percentage vergaderingen aanwezig'].astype(float)
-    #Iterate over all permanent members of parliament
-    for index_members, row_members in member_amount_meetings_pd.iterrows():
+    #Add extra columns for amount of relevant meetings, percentage and amount commissions as permanent member
+    aanwezigheid_per_lid_df['Aantal relevante vergaderingen'] = 0
+    aanwezigheid_per_lid_df['Percentage vergaderingen aanwezig'] = 0.0 # initialise as float
+    aanwezigheid_per_lid_df['Aantal commissies waarin vast lid'] = 0
+    #Fill amount of relevant meetings: Iterate over all permanent members of parliament
+    for index_members, row_members in aanwezigheid_per_lid_df.iterrows():
         # Iterate for each member through all commissions. 
         # If they are a permanent member, add the amount of meetings of that commission to their key in the dict
         for index_overview, row_overview in commissions_overview_df.iterrows():
             if index_members in row_overview["vaste leden"]:
-                member_amount_meetings_pd.at[index_members, 'Aantal relevante vergaderingen'] += row_overview['aantal vergaderingen']
+                aanwezigheid_per_lid_df.at[index_members, 'Aantal relevante vergaderingen'] += row_overview['aantal vergaderingen']
+        
                 
     
     #Iterate over all permanent members of parliament
-    for index_members, row_members in member_amount_meetings_pd.iterrows():
-        # Extract the aggregated count out of aanwezig_per_lid for the relevant member (i.e. serving as index) and add to member_amount_meetings_pd at relevant index
-        verg_aanwezig = aanwezig_per_lid.loc[index_members, "Aggregated_Count"]
-        member_amount_meetings_pd.at[index_members, "Aantal vergaderingen aanwezig"] = verg_aanwezig
-        verg_afwezig = aanwezig_per_lid.loc[index_members, "Aggregated_Count"]
-        member_amount_meetings_pd.at[index_members, "Aantal vergaderingen afwezig"] = verg_afwezig
-        verg_verontschuldigd = aanwezig_per_lid.loc[index_members, "Aggregated_Count"]
-        member_amount_meetings_pd.at[index_members, "Aantal vergaderingen verontschuldigd"] = verg_verontschuldigd
-        
+    for index_members, row_members in aanwezigheid_per_lid_df.iterrows():
         # Obtain percentage of attended meetings (taking zero division into account, i.e. with Aantal relevante vergaderingen == 0)
-        percentage_attendance = verg_aanwezig / row_members['Aantal relevante vergaderingen'] if row_members['Aantal relevante vergaderingen'] != 0 else 0.0      
-        member_amount_meetings_pd.at[index_members, "Percentage vergaderingen aanwezig"] = percentage_attendance
+        percentage_attendance = row_members['Aantal vergaderingen aanwezig'] / row_members['Aantal relevante vergaderingen'] if row_members['Aantal relevante vergaderingen'] != 0 else 0.0      
+        aanwezigheid_per_lid_df.at[index_members, "Percentage vergaderingen aanwezig"] = percentage_attendance
+
     # Sort dataframe by percentage attended
-    member_amount_meetings_pd = member_amount_meetings_pd.sort_values(by = "Percentage vergaderingen aanwezig", ascending = False)
+    aanwezigheid_per_lid_df = aanwezigheid_per_lid_df.sort_values(by = "Percentage vergaderingen aanwezig", ascending = False)
     
     # Add parties of relevant members
     parties_list = []
-    for member in member_amount_meetings_pd.index:
+    for member in aanwezigheid_per_lid_df.index:
         party = attendance_statistics.find_member(fracties_dict_input, member)
         parties_list.append(party)       
-    member_amount_meetings_pd["Partij"] = parties_list
+    aanwezigheid_per_lid_df["Partij"] = parties_list
     
     # Mapping members to the amount of commission they are permanent member of
     # using the grouped_by_count_dict obtained before
-    member_amount_meetings_pd['Aantal commissies waarin vast lid'] = member_amount_meetings_pd.index.map(name2count_permanent_dict_input)
+    aanwezigheid_per_lid_df['Aantal commissies waarin vast lid'] = aanwezigheid_per_lid_df.index.map(name2count_permanent_dict_input)
     
     
-    return member_amount_meetings_pd
+    return aanwezigheid_per_lid_df
 
 
 def obtain_attendance_non_permanent_members(commissions_overview_df_input, 
@@ -458,9 +450,10 @@ def update_graph_scatter_permanent(df_input):
             lambda row: (
                 f"<b>{row.name}</b> was in de huidige periode <br>"
                 f"op een totaal van {row['Aantal relevante vergaderingen']} vergaderingen <br>"
-                f"{row['Aantal vergaderingen aanwezig']} keer aanwezig, "
-                f"{row['Aantal vergaderingen afwezig']} keer afwezig en "
-                f"{row['Aantal vergaderingen verontschuldigd']} keer verontschuldigd. <br>"
+                # show int instead of float (always x.0) unless NaN: then substitutes 'N/A' in the output instead of trying to convert it to an integer)
+                f"{int(row['Aantal vergaderingen aanwezig']) if not pd.isnull(row['Aantal vergaderingen aanwezig']) else '<i>N/A</i>'} keer aanwezig, "
+                f"{int(row['Aantal vergaderingen afwezig']) if not pd.isnull(row['Aantal vergaderingen afwezig']) else '<i>N/A</i>'} keer afwezig en "
+                f"{int(row['Aantal vergaderingen verontschuldigd']) if not pd.isnull(row['Aantal vergaderingen verontschuldigd']) else '<i>N/A</i>'} keer verontschuldigd. <br>"
                 f"Dat brengt het aanwezigheidspercentage op <b>{row['Percentage vergaderingen aanwezig']:.1%}</b>.<br><br>"
                 f"Zetelt als vast lid in {row['Aantal commissies waarin vast lid']} commissie(s)."
             ),
@@ -500,7 +493,6 @@ def update_graph_scatter_permanent(df_input):
         ),
     )
     
-    # print(df_input['Aantal commissies waarin vast lid'])
     
     return fig
 
@@ -542,7 +534,6 @@ def update_graph_scatter_non_permanent(df_input):
         customdata=hover_text,
     )
     
-    # print(df_input['Aantal commissies waarin vast lid'])
     
     return fig
 
