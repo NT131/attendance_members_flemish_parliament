@@ -21,19 +21,19 @@ import attendance_statistics # import functions of attendance_statistics.py (i.e
 # Read in all meetings and attendance (both full (i.e. dict with party and id) and short (i.e. only name)
 relevant_extraction_date = "2023-12-18"
 
-meetings_all_commissions_df = pd.read_pickle(f'../../data/meetings_all_commissions_df_{relevant_extraction_date}.pkl')
-meetings_all_commissions_short_df = pd.read_pickle(f'../../data/meetings_all_commissions_short_df_{relevant_extraction_date}.pkl')
+meetings_all_commissions_df = pd.read_pickle(f'../data/meetings_all_commissions_df_{relevant_extraction_date}.pkl')
+meetings_all_commissions_short_df = pd.read_pickle(f'../data/meetings_all_commissions_short_df_{relevant_extraction_date}.pkl')
 
 # Obtain list of available commissions in dataframe
 diff_commissions = list(set(meetings_all_commissions_df["commissie.titel"]))
 
 # Read in commission_overview_df with overall info on each commission
-commissions_overview_df = pd.read_pickle(f'../../data/commissions_overview_df_{relevant_extraction_date}.pkl')
+commissions_overview_df = pd.read_pickle(f'../data/commissions_overview_df_{relevant_extraction_date}.pkl')
 
 # Load information about parties
-with open(f'../../data/fracties.pkl', 'rb') as file:
+with open(f'../data/fracties.pkl', 'rb') as file:
     fracties_dict = pickle.load(file)
-with open(f'../../data/parlementsleden.pkl', 'rb') as file:
+with open(f'../data/parlementsleden.pkl', 'rb') as file:
     parlementsleden_all_dict = pickle.load(file)
 
 
@@ -95,6 +95,7 @@ layout = html.Div(
                             max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
                             start_date=meetings_all_commissions_df["Datum vergadering"].min(),
                             end_date=meetings_all_commissions_df["Datum vergadering"].max(),
+                            display_format='DD/MM/YYYY',  # Set the display format to 'dd/mm/yyyy' instead of default 'mm/dd/yyyy'
                         ),
                     ],
                     className="menu-element"
@@ -129,7 +130,7 @@ layout = html.Div(
                     children=[
                         html.H3("Gemiddelde aanwezigheid per lid in commissies waar ze geen vast lid zijn", className="header-subsubtitle"),
                         html.P(
-                            "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze <i>geen</i>vast lid zijn?",
+                            "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze geen vast lid zijn?",
                             className="header-description",
                         ),
                     ],
