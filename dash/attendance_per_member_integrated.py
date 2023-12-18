@@ -141,6 +141,7 @@ layout = html.Div(
             className="wrapper",
         ),
     ],
+    # use CSS flexbox approach to easily structure graphs and titles
     style={"display": "flex", "flex-direction": "column"}
 )
 

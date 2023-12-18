@@ -41,56 +41,159 @@ app = dash.Dash(__name__, assets_folder='assets') # Relative path to the folder 
 ## Comment in integrated approach
 # app.
 # Create the layout
-layout = html.Div(  
-    children=[
-        # # Header section
+# layout = html.Div(  
+    # children=[
+        # # # Header section
+        # # html.Div(
+            # # children=[
+                # # # Title
+                # # html.H1(
+                    # # children="Aanwezigheid Vlaamse parlementsleden",
+                    # # className="header-title",
+                    # # style={"color": "#FFFFFF"}
+                # # ),
+                # # # Description
+                # # html.P(
+                    # # children=(
+                        # # "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+                        # # ),
+                    # # className="header-description",
+                    # # style={"color": "#FFFFFF"}
+                # # ),
+            # # ],
+            # # className="section-header",
+            # # style={"background-color": "#222222"} # Set dark background for this section
+        # # ),
+        # # Aanwezigheid leden per partij
         # html.Div(
             # children=[
-                # # Title
-                # html.H1(
-                    # children="Aanwezigheid Vlaamse parlementsleden",
-                    # className="header-title",
-                    # style={"color": "#FFFFFF"}
-                # ),
-                # # Description
-                # html.P(
-                    # children=(
-                        # "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+                # # Header
+                # html.Div(
+                    # children=[
+                        # html.H2(
+                            # "Aanwezigheidsgegevens van parlementsleden per partij",
+                            # className="header-subsubtitle",
                         # ),
-                    # className="header-description",
-                    # style={"color": "#FFFFFF"}
+                        # html.P(
+                            # children=(
+                                # "Welke partij woonde het meest frequent vergaderingen van commissies bij?"
+                            # ),
+                            # className="header-description",
+                        # ),
+                    # ],
+                    # className="section-header",
+                # ),
+                # # Selecting relevant data
+                # html.Div(
+                    # children=[
+                        # html.H3(
+                            # "Selecteer de relevante commissie(s) en de periode.",
+                            # className="header-subsubtitle",
+                        # ),
+                        # # Dropdown to select commission
+                        # html.Div(
+                            # children=[
+                                # html.Div(
+                                    # children="Welke commissie?", 
+                                    # className="menu-title"
+                                # ),
+                                # dcc.Dropdown(
+                                    # id='commissie-dropdown-per-party',
+                                    # options=dropdown_options_commission,
+                                    # value="Alle commissies", # default value
+                                    # clearable=False,
+                                    # className="dropdown",
+                                # ),
+                            # ],
+                            # className="menu-element" 
+                        # ),
+                        # # # Dropdown to select the political party
+                        # # html.Div(
+                            # # children=[
+                                # # html.Div(
+                                    # # children="Resultaten voor welke politieke partij?", 
+                                    # # className="menu-title"),   
+                                # # dcc.Dropdown(
+                                    # # id="dropdown_party",
+                                    # # options=dropdown_options_party,
+                                    # # value="Alle partijen", # default value
+                                    # # clearable=False,
+                                    # # className="dropdown",
+                                # # ),
+                            # # ]
+                        # # ),
+                        # # Datepicker to select relevant timeframe
+                        # html.Div(
+                            # children=[
+                                # html.Div(
+                                    # children="Relevante periode", 
+                                    # className="menu-title"
+                                # ),
+                                # dcc.DatePickerRange(
+                                    # id="date-range-per-party",
+                                    # min_date_allowed=meetings_all_commissions_df["Datum vergadering"].min(),
+                                    # max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
+                                    # start_date=meetings_all_commissions_df["Datum vergadering"].min(),
+                                    # end_date=meetings_all_commissions_df["Datum vergadering"].max(),
+                                # ),
+                            # ],
+                            # className="menu-element"
+                        # ),
+                    # ], 
+                    # className="section-chart",
+                # ),   
+                # # Attendance of commissions per party
+                # html.Div(
+                    # children=[    
+                        # # Graph attendance_per_party
+                        # html.Div([
+                            # dcc.Graph(id='attendance_per_party_percentage_graph')
+                            # ]
+                        # ),
+                        # # Table attendance_per_party
+                        # html.Div(
+                            # className="table-container",
+                            # children=[
+                                # html.Div(
+                                    # # Display the attendance_per_party_percentage_table
+                                    # id='attendance_per_party_percentage_table',
+                                    # className="table",
+                                    # children=html.P("Tabel niet beschikbaar", style={"color": "red"})
+                                # ),
+                            # ]
+                        # )
+                    # ],
                 # ),
             # ],
-            # className="section-header",
-            # style={"background-color": "#222222"} # Set dark background for this section
+            # className="wrapper",
         # ),
-        # Aanwezigheid leden per partij
+    # ]
+# )
+
+layout = html.Div(  
+    children=[
         html.Div(
             children=[
-                # Header
-                html.Div(
-                    children=[
-                        html.H2(
-                            "Aanwezigheidsgegevens van parlementsleden per partij",
-                            className="header-subsubtitle",
-                        ),
-                        html.P(
-                            children=(
-                                "Welke partij woonde het meest frequent vergaderingen van commissies bij?"
-                            ),
-                            className="header-description",
-                        ),
-                    ],
-                    className="section-header",
+                html.H2(
+                    "Aanwezigheidsgegevens van parlementsleden per partij",
+                    className="header-subsubtitle",
                 ),
-                # Selecting relevant data
+                html.P(
+                    "Welke partij woonde het meest frequent vergaderingen van commissies bij?",
+                    className="header-description",
+                ),
+            ],
+            className="section-header",
+        ),
+
+        html.Div(
+            children=[
                 html.Div(
                     children=[
                         html.H3(
                             "Selecteer de relevante commissie(s) en de periode.",
                             className="header-subsubtitle",
                         ),
-                        # Dropdown to select commission
                         html.Div(
                             children=[
                                 html.Div(
@@ -107,22 +210,6 @@ layout = html.Div(
                             ],
                             className="menu-element" 
                         ),
-                        # # Dropdown to select the political party
-                        # html.Div(
-                            # children=[
-                                # html.Div(
-                                    # children="Resultaten voor welke politieke partij?", 
-                                    # className="menu-title"),   
-                                # dcc.Dropdown(
-                                    # id="dropdown_party",
-                                    # options=dropdown_options_party,
-                                    # value="Alle partijen", # default value
-                                    # clearable=False,
-                                    # className="dropdown",
-                                # ),
-                            # ]
-                        # ),
-                        # Datepicker to select relevant timeframe
                         html.Div(
                             children=[
                                 html.Div(
@@ -141,34 +228,35 @@ layout = html.Div(
                         ),
                     ], 
                     className="section-chart",
-                ),   
-                # Attendance of commissions per party
-                html.Div(
-                    children=[    
-                        # Graph attendance_per_party
-                        html.Div([
-                            dcc.Graph(id='attendance_per_party_percentage_graph')
-                            ]
-                        ),
-                        # Table attendance_per_party
-                        html.Div(
-                            className="table-container",
-                            children=[
-                                html.Div(
-                                    # Display the attendance_per_party_percentage_table
-                                    id='attendance_per_party_percentage_table',
-                                    className="table",
-                                    children=html.P("Tabel niet beschikbaar", style={"color": "red"})
-                                ),
-                            ]
-                        )
-                    ],
                 ),
             ],
             className="wrapper",
         ),
-    ]
+
+        html.Div(
+            children=[
+                # Graph attendance_per_party
+                dcc.Graph(id='attendance_per_party_percentage_graph'),
+                # Table attendance_per_party
+                html.Div(
+                    className="table-container",
+                    children=[
+                        html.Div(
+                            # Display the attendance_per_party_percentage_table
+                            id='attendance_per_party_percentage_table',
+                            className="table",
+                            children=html.P("Tabel niet beschikbaar", style={"color": "red"})
+                        ),
+                    ]
+                )
+            ],
+            className="wrapper",
+        ),
+    ],
+    # use CSS flexbox approach to easily structure graphs and titles
+    style={"display": "flex", "flex-direction": "column"} 
 )
+
 
 #Define function to filter data based on user selection
 def filter_data(start_date, end_date, commission_value, 
@@ -274,9 +362,9 @@ def update_attendance_per_party_graph(attendance_per_party_percentage):
     index = np.arange(len(sorted_parties))
 
     # Create traces for each bar section
-    trace_aanwezig = go.Bar(y=sorted_parties, x=bars_aanwezig, orientation='h', name='Aanwezig', marker=dict(color='green'))
-    trace_afwezig = go.Bar(y=sorted_parties, x=bars_afwezig, orientation='h', name='Afwezig', marker=dict(color='red'))
-    trace_verontschuldigd = go.Bar(y=sorted_parties, x=bars_verontschuldigd, orientation='h', name='Verontschuldigd', marker=dict(color='orange'))
+    trace_aanwezig = go.Bar(y=sorted_parties, x=bars_aanwezig, orientation='h', name='Aanwezig', marker=dict(color='green'), hoverinfo='x', hovertemplate='%{x:.1f}%')  # Display value on hover, in percentage format
+    trace_afwezig = go.Bar(y=sorted_parties, x=bars_afwezig, orientation='h', name='Afwezig', marker=dict(color='red'), hoverinfo='x', hovertemplate='%{x:.1f}%')  # Display value on hover, in percentage format
+    trace_verontschuldigd = go.Bar(y=sorted_parties, x=bars_verontschuldigd, orientation='h', name='Verontschuldigd', marker=dict(color='orange'), hoverinfo='x', hovertemplate='%{x:.1f}%')  # Display value on hover, in percentage format
 
     data = [trace_aanwezig, trace_afwezig, trace_verontschuldigd]
 

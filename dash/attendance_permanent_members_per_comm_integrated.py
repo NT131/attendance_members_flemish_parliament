@@ -49,50 +49,143 @@ dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}]
 # Create the layout
 ## Comment in integrated approach
 # app.
-layout = html.Div(  
-    children=[
-        # # Header section
+
+
+# layout = html.Div(  
+    # children=[
+        # # # Header section
+        # # html.Div(
+            # # children=[
+                # # # Title
+                # # html.H1(
+                    # # children="Aanwezigheid Vlaamse parlementsleden",
+                    # # className="header-title",
+                    # # style={"color": "#FFFFFF"}
+                # # ),
+                # # # Description
+                # # html.P(
+                    # # children=(
+                        # # "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+                        # # ),
+                    # # className="header-description",
+                    # # style={"color": "#FFFFFF"}
+                # # ),
+            # # ],
+            # # className="section-header",
+            # # style={"background-color": "#222222"} # Set dark background for this section
+        # # ),
+        # # Gemiddelde aanwezigheid vaste leden in commissie + alle leden per partij
         # html.Div(
             # children=[
-                # # Title
-                # html.H1(
-                    # children="Aanwezigheid Vlaamse parlementsleden",
-                    # className="header-title",
-                    # style={"color": "#FFFFFF"}
-                # ),
-                # # Description
-                # html.P(
-                    # children=(
-                        # "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+                # # Header
+                # html.Div(
+                    # children=[
+                        # html.H2(
+                            # "Aanwezigheid van parlementsleden per commissie",
+                            # className="header-subtitle",
                         # ),
-                    # className="header-description",
-                    # style={"color": "#FFFFFF"}
+                    # ],
+                    # className="section-header",
                 # ),
+                # # Selecting relevant data
+                # html.Div(
+                    # children=[
+                        # html.H3(
+                            # "Selecteer de relevante commissie(s) en de periode.",
+                            # className="header-subsubtitle",
+                        # ),
+                        # # Dropdown to select commission
+                        # html.Div(
+                            # children=[
+                                # html.Div(
+                                    # children="Welke commissie?", 
+                                    # className="menu-title"
+                                # ),
+                                # dcc.Dropdown(
+                                    # id='commissie-dropdown-per-com',
+                                    # options=dropdown_options_commission,
+                                    # value="Alle commissies", # default value
+                                    # clearable=False,
+                                    # className="dropdown",
+                                # ),
+                            # ],
+                            # className="menu-element" 
+                        # ),
+                        # # Datepicker to select relevant timeframe
+                        # html.Div(
+                            # children=[
+                                # html.Div(
+                                    # children="Relevante periode", 
+                                    # className="menu-title"
+                                # ),
+                                # dcc.DatePickerRange(
+                                    # id="date-range-per-com",
+                                    # min_date_allowed=meetings_all_commissions_df["Datum vergadering"].min(),
+                                    # max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
+                                    # start_date=meetings_all_commissions_df["Datum vergadering"].min(),
+                                    # end_date=meetings_all_commissions_df["Datum vergadering"].max(),
+                                # ),
+                            # ],
+                            # className="menu-element"
+                        # ),
+                    # ], 
+                    # className="section-chart",
+                # ),
+                # # "Gemiddelde aanwezigheid vaste leden in commissies"
+                # html.Div(
+                    # children=[
+                        # # Header
+                        # html.Div(
+                            # children=[
+                                # html.H3(
+                                    # "Gemiddelde aanwezigheid vaste leden in commissies",
+                                    # className="header-subsubtitle",
+                                # ),
+                                # html.P(
+                                    # children=(
+                                        # "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?"
+                                    # ),
+                                    # className="header-description",
+                                # ),
+                            # ],
+                            # className="section-header",
+                            # ),
+                        # # Pie chart
+                        # html.Div([
+                            # html.Div(id='graphs_container'),
+                            # # Add a dummy component to trigger the update
+                            # html.Div(id='dummy-trigger', style={'display': 'none'})
+                            # ],
+                            # className="graph-title",  # Allow word wrapping in titles
+                        # ),
+                     # ]
+                # ),       
             # ],
-            # className="section-header",
-            # style={"background-color": "#222222"} # Set dark background for this section
+            # className="wrapper",
         # ),
-        # Gemiddelde aanwezigheid vaste leden in commissie + alle leden per partij
+    # ]
+# )
+
+layout = html.Div(  
+    children=[
         html.Div(
             children=[
-                # Header
-                html.Div(
-                    children=[
-                        html.H2(
-                            "Gemiddelde aanwezigheid vaste leden in commissie + alle leden per partij",
-                            className="header-subtitle",
-                        ),
-                    ],
-                    className="section-header",
+                html.H2(
+                    "Aanwezigheid van parlementsleden per commissie",
+                    className="header-subtitle",
                 ),
-                # Selecting relevant data
+            ],
+            className="section-header",
+        ),
+
+        html.Div(
+            children=[
                 html.Div(
                     children=[
                         html.H3(
                             "Selecteer de relevante commissie(s) en de periode.",
                             className="header-subsubtitle",
                         ),
-                        # Dropdown to select commission
                         html.Div(
                             children=[
                                 html.Div(
@@ -109,7 +202,6 @@ layout = html.Div(
                             ],
                             className="menu-element" 
                         ),
-                        # Datepicker to select relevant timeframe
                         html.Div(
                             children=[
                                 html.Div(
@@ -129,40 +221,40 @@ layout = html.Div(
                     ], 
                     className="section-chart",
                 ),
-                # "Gemiddelde aanwezigheid vaste leden in commissies"
-                html.Div(
-                    children=[
-                        # Header
-                        html.Div(
-                            children=[
-                                html.H3(
-                                    "Gemiddelde aanwezigheid vaste leden in commissies",
-                                    className="header-subsubtitle",
-                                ),
-                                html.P(
-                                    children=(
-                                        "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?"
-                                    ),
-                                    className="header-description",
-                                ),
-                            ],
-                            className="section-header",
-                            ),
-                        # Pie chart
-                        html.Div([
-                            html.Div(id='graphs_container'),
-                            # Add a dummy component to trigger the update
-                            html.Div(id='dummy-trigger', style={'display': 'none'})
-                            ],
-                            className="graph-title",  # Allow word wrapping in titles
-                        ),
-                     ]
-                ),       
             ],
             className="wrapper",
         ),
-    ]
+
+        html.Div(
+            children=[
+                html.Div(
+                    children=[
+                        html.H3(
+                            "Gemiddelde aanwezigheid vaste leden in commissies",
+                            className="header-subsubtitle",
+                        ),
+                        html.P(
+                            "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?",
+                            className="header-description",
+                        ),
+                    ],
+                    className="section-header",
+                ),
+                html.Div(
+                    children=[
+                        html.Div(id='graphs_container'),  # Pie chart container
+                        html.Div(id='dummy-trigger', style={'display': 'none'})  # Dummy component for update
+                    ],
+                    className="graph-title",
+                ),
+            ],
+            className="wrapper",
+        ),
+    ],
+    # use CSS flexbox approach to easily structure graphs and titles
+    style={"display": "flex", "flex-direction": "column"}
 )
+
 
 #Define function to filter data based on user selection
 def filter_data(start_date, end_date, commission_value, 
