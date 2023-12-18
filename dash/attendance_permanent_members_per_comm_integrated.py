@@ -51,27 +51,27 @@ dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}]
 # app.
 layout = html.Div(  
     children=[
-        # Header section
-        html.Div(
-            children=[
-                # Title
-                html.H1(
-                    children="Aanwezigheid Vlaamse parlementsleden",
-                    className="header-title",
-                    style={"color": "#FFFFFF"}
-                ),
-                # Description
-                html.P(
-                    children=(
-                        "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
-                        ),
-                    className="header-description",
-                    style={"color": "#FFFFFF"}
-                ),
-            ],
-            className="section-header",
-            style={"background-color": "#222222"} # Set dark background for this section
-        ),
+        # # Header section
+        # html.Div(
+            # children=[
+                # # Title
+                # html.H1(
+                    # children="Aanwezigheid Vlaamse parlementsleden",
+                    # className="header-title",
+                    # style={"color": "#FFFFFF"}
+                # ),
+                # # Description
+                # html.P(
+                    # children=(
+                        # "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+                        # ),
+                    # className="header-description",
+                    # style={"color": "#FFFFFF"}
+                # ),
+            # ],
+            # className="section-header",
+            # style={"background-color": "#222222"} # Set dark background for this section
+        # ),
         # Gemiddelde aanwezigheid vaste leden in commissie + alle leden per partij
         html.Div(
             children=[
@@ -100,7 +100,7 @@ layout = html.Div(
                                     className="menu-title"
                                 ),
                                 dcc.Dropdown(
-                                    id='commissie-dropdown',
+                                    id='commissie-dropdown-per-com',
                                     options=dropdown_options_commission,
                                     value="Alle commissies", # default value
                                     clearable=False,
@@ -117,7 +117,7 @@ layout = html.Div(
                                     className="menu-title"
                                 ),
                                 dcc.DatePickerRange(
-                                    id="date-range",
+                                    id="date-range-per-com",
                                     min_date_allowed=meetings_all_commissions_df["Datum vergadering"].min(),
                                     max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
                                     start_date=meetings_all_commissions_df["Datum vergadering"].min(),
@@ -279,9 +279,9 @@ def register_callbacks(app):
     # Define callback to update display based on selected commission and date range
     @app.callback(
         Output('graphs_container', 'children'),
-        [Input('commissie-dropdown', 'value'),
-         Input('date-range', 'start_date'),
-         Input('date-range', 'end_date')]
+        [Input('commissie-dropdown-per-com', 'value'),
+         Input('date-range-per-com', 'start_date'),
+         Input('date-range-per-com', 'end_date')]
     )
     def update_display(commission_value, start_date, end_date):
         # Filter df based on user input

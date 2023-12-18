@@ -64,44 +64,18 @@ party_colors = {'Groen': '#83de62',
 # Create the layout
 layout = html.Div(
     children=[
-        # Header section
         html.Div(
             children=[
-                # Title
-                html.H1(
-                    children="Aanwezigheid in commissies waarin parlementslid vast lid is",
-                    className="header-title",
-                    style={"color": "#FFFFFF"}
-                ),
-                # Description
+                html.H2("Aanwezigheidsgegevens van parlementsleden per lid", className="header-subsubtitle"),
                 html.P(
-                    children=(
-                        "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?"
-                        ),
+                    "Hoe vaak woonden leden vergaderingen van commissies bij, zowel als vast lid als als vervanger?",
                     className="header-description",
-                    style={"color": "#FFFFFF"}
                 ),
-            ],
-            className="section-header",
-            style={"background-color": "#222222"} # Set dark background for this section
-        ),
-        # Selecting relevant data
-        html.Div(
-            children=[
-                # Title
-                html.H3(
-                    "Selecteer de relevante partij en de periode.",
-                    className="header-subsubtitle",
-                ),
-                # Dropdown to select party
                 html.Div(
                     children=[
-                        html.Div(
-                            children="Welke partij?", 
-                            className="menu-title"
-                        ),
+                        html.Div("Welke partij?", className="menu-title"),
                         dcc.Dropdown(
-                            id='party-dropdown',
+                            id='party-dropdown-per-member',
                             options=dropdown_options_party,
                             value="Alle partijen", # default value
                             clearable=False,
@@ -110,15 +84,11 @@ layout = html.Div(
                     ],
                     className="menu-element" 
                 ),
-                # Datepicker to select relevant timeframe
                 html.Div(
                     children=[
-                        html.Div(
-                            children="Relevante periode", 
-                            className="menu-title"
-                        ),
+                        html.Div("Relevante periode", className="menu-title"),
                         dcc.DatePickerRange(
-                            id="date-range",
+                            id="date-range-per-member",
                             min_date_allowed=meetings_all_commissions_df["Datum vergadering"].min(),
                             max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
                             start_date=meetings_all_commissions_df["Datum vergadering"].min(),
@@ -128,53 +98,52 @@ layout = html.Div(
                     className="menu-element"
                 ),
             ],
-            className="menu",
+            className="section-header",
         ),
+
         html.Div(
             children=[
                 html.Div(
-                    # Graph of the average attendance per permanent member
-                    children=dcc.Graph(
-                        id="permanent_member_amount_meetings_df_graph",
-                    ),
-                    className="card",
+                    children=[
+                        html.H3("Gemiddelde aanwezigheid per lid in vaste commisises", className="header-subsubtitle"),
+                        html.P(
+                            "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?",
+                            className="header-description",
+                        ),
+                    ],
+                    className="section-header",
                 ),
                 html.Div(
-                    # Graph of the average attendance per non-permanent member
-                    children=dcc.Graph(
-                        id="non_permanent_member_amount_meetings_df_graph",
-                    ),
+                    children=dcc.Graph(id="permanent_member_amount_meetings_df_graph"),
                     className="card",
                 ),
-                # html.Div(
-                # # Table of the attendance data for each member
-                    # children=[
-                        # html.H2(
-                            # "Aanwezigheidsgegevens",
-                            # className="header-title",
-                            # style={"color": "#333333", "padding": "10px"} # ensure header has dark font since no dark background as in main title
-                        # ),
-                        # html.P(
-                            # children=(
-                                # "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?"
-                                # ),
-                            # className="header-description",
-                            # style={"color": "#333333"} # ensure header has dark font since no dark background as in main title
-                        # ),
-                    # ]
-                # ),
-                # html.Div(
-                    # # Display the table
-                    # children=html.Div(
-                        # id="member_amount_meetings_df_table",
-                        # className="dash_table"
-                        # ),
-                # ),
             ],
             className="wrapper",
         ),
-    ]
+
+        html.Div(
+            children=[
+                html.Div(
+                    children=[
+                        html.H3("Gemiddelde aanwezigheid per lid in commissies waar ze geen vast lid zijn", className="header-subsubtitle"),
+                        html.P(
+                            "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze <i>geen</i>vast lid zijn?",
+                            className="header-description",
+                        ),
+                    ],
+                    className="section-header",
+                ),
+                html.Div(
+                    children=dcc.Graph(id="non_permanent_member_amount_meetings_df_graph"),
+                    className="card",
+                ),
+            ],
+            className="wrapper",
+        ),
+    ],
+    style={"display": "flex", "flex-direction": "column"}
 )
+
 
 # Define function to filter data based on user selection
 def filter_data(start_date, end_date, party_value, 
@@ -503,7 +472,7 @@ def update_graph_scatter_non_permanent(df_input):
     hover_text = (
         df_input.apply(
             lambda row: (
-                f"<b>{row.name}</b> was in de huidige periode <b> {row['Aantal vergaderingen aanwezig']} </b> keer aanwezig <br>"
+                f"<b>{row.name}</b> was in de huidige periode <b> {row['Aantal vergaderingen aanwezig']}</b> keer aanwezig <br>"
                 f"op vergaderingen van commissies waarvan deze geen vast lid is. <br><br>"
                 f"Zetelt als vast lid in {row['Aantal commissies waarin vast lid']} commissie(s)."
             ),
@@ -550,9 +519,9 @@ def register_callbacks(app):
             # Output("member_amount_meetings_df_table", "children")
         ],
         [
-            Input("party-dropdown", "value"),
-            Input('date-range', 'start_date'),
-            Input('date-range', 'end_date')
+            Input("party-dropdown-per-member", "value"),
+            Input('date-range-per-member', 'start_date'),
+            Input('date-range-per-member', 'end_date')
         ]
     )
     def update_display(party_value, start_date, end_date):

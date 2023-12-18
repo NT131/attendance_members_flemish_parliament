@@ -43,27 +43,27 @@ app = dash.Dash(__name__, assets_folder='assets') # Relative path to the folder 
 # Create the layout
 layout = html.Div(  
     children=[
-        # Header section
-        html.Div(
-            children=[
-                # Title
-                html.H1(
-                    children="Aanwezigheid Vlaamse parlementsleden",
-                    className="header-title",
-                    style={"color": "#FFFFFF"}
-                ),
-                # Description
-                html.P(
-                    children=(
-                        "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
-                        ),
-                    className="header-description",
-                    style={"color": "#FFFFFF"}
-                ),
-            ],
-            className="section-header",
-            style={"background-color": "#222222"} # Set dark background for this section
-        ),
+        # # Header section
+        # html.Div(
+            # children=[
+                # # Title
+                # html.H1(
+                    # children="Aanwezigheid Vlaamse parlementsleden",
+                    # className="header-title",
+                    # style={"color": "#FFFFFF"}
+                # ),
+                # # Description
+                # html.P(
+                    # children=(
+                        # "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+                        # ),
+                    # className="header-description",
+                    # style={"color": "#FFFFFF"}
+                # ),
+            # ],
+            # className="section-header",
+            # style={"background-color": "#222222"} # Set dark background for this section
+        # ),
         # Aanwezigheid leden per partij
         html.Div(
             children=[
@@ -98,7 +98,7 @@ layout = html.Div(
                                     className="menu-title"
                                 ),
                                 dcc.Dropdown(
-                                    id='commissie-dropdown',
+                                    id='commissie-dropdown-per-party',
                                     options=dropdown_options_commission,
                                     value="Alle commissies", # default value
                                     clearable=False,
@@ -130,7 +130,7 @@ layout = html.Div(
                                     className="menu-title"
                                 ),
                                 dcc.DatePickerRange(
-                                    id="date-range",
+                                    id="date-range-per-party",
                                     min_date_allowed=meetings_all_commissions_df["Datum vergadering"].min(),
                                     max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
                                     start_date=meetings_all_commissions_df["Datum vergadering"].min(),
@@ -409,9 +409,9 @@ def register_callbacks(app):
         Output('attendance_per_party_percentage_table', 'children'),
         Output('attendance_per_party_percentage_graph', 'figure')
          ], 
-        [Input('commissie-dropdown', 'value'),
-         Input('date-range', 'start_date'),
-         Input('date-range', 'end_date')]
+        [Input('commissie-dropdown-per-party', 'value'),
+         Input('date-range-per-party', 'start_date'),
+         Input('date-range-per-party', 'end_date')]
     )
     def update_display(commission_value, start_date, end_date):
         # Filter df based on user input
