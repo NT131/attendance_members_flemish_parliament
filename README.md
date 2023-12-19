@@ -5,4 +5,4 @@ Initial data extraction from the Parliament's API (https://ws.vlpar.be/e/opendat
 
 Further data modification and graph building was tried out in Jupyter Notebook, but implemented in .py files under the `dash` folder.
 
-The application is hosted at http://nielstack.eu.pythonanywhere.com/. The required WSGI file is located at the `flask` folder. 
+The application is hosted at http://nielstack.eu.pythonanywhere.com/. The required WSGI file is located at the `dash/flask` folder. 
