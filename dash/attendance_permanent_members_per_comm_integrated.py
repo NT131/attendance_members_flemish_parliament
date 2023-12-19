@@ -2,7 +2,10 @@ import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
 
-import dash_bootstrap_components as dbc #to use .Col feature for displaying multiple pie charts
+try:
+    import dash_bootstrap_components as dbc #to use .Col feature for displaying multiple pie charts
+except:
+    print('dash_bootstrap_components package not installed')
 
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
