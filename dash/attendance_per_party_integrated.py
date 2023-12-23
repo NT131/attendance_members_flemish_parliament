@@ -5,7 +5,7 @@ from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 
-from collections import Counter
+
 
 import numpy as np
 import pandas as pd
