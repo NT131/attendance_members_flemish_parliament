@@ -42,7 +42,13 @@ app.layout = html.Div([
         dcc.Tab(
             label='Aanwezigheid per parlementslid', 
             children=attendance_per_member_integrated.layout),
-        ])
+        ]
+	),
+	# Footer with hyperlink to GitHub
+	html.Footer(["De code en data voor deze toepassing is beschikbaar op ",
+				 html.A("GitHub", href="https://github.com/NT131/attendance_members_flemish_parliament")
+				]
+	),
 ])
 
   
