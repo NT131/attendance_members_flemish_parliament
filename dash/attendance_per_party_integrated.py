@@ -37,6 +37,10 @@ with open(f'../data/parlementsleden.pkl', 'rb') as file:
 dropdown_options_commission = [{"label": "Alle commissies", "value": "Alle commissies"}] + [{'label': item, 'value': item} for item in diff_commissions]
 dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}] + [{"label": party, "value": party} for party in fracties_dict.keys()] 
 
+# Create a default value for amount_meetings, i.e. relevant meetings
+amount_meetings = len(meetings_all_commissions_df)  # Set amount of all meetings as default, it will be updated in the callback
+
+
 # Build app
 app = dash.Dash(__name__, assets_folder='assets') # Relative path to the folder of css file)
 
@@ -229,6 +233,9 @@ layout = html.Div(
                             ],
                             className="menu-element"
                         ),
+						# Display impact of data selection (i.e. how many meetings are taken into account)	
+						html.Div(id='amount_meetings',
+								children=f"Deze selectie resulteert in {amount_meetings} relevante vergaderingen."), 
                     ], 
                     className="section-chart",
                 ),
@@ -297,7 +304,7 @@ commissions_overview_df, meetings_all_commissions_df):
     # print(filtered_df_overview)
     return (filtered_df_overview, meetings_all_commissions_filtered_df)
     
-
+	
 def update_attendance_per_party(commissions_overview_df_input, fracties_dict_input):
     """
     To obtain an overview of how members of each party attend meetings, we group the counts of each members along the party the are member to. We use the helper function get_overall_presence() to obtain this for each attendance status ('Aanwezig', 'Afwezig', 'Verontschuldigd').
@@ -497,8 +504,9 @@ def register_callbacks(app):
     # Define callback to update display based on selected commission and date range
     @app.callback(
         [
-        Output('attendance_per_party_percentage_table', 'children'),
-        Output('attendance_per_party_percentage_graph', 'figure')
+        Output('amount_meetings', 'children'),
+	   	Output('attendance_per_party_percentage_table', 'children'),
+        Output('attendance_per_party_percentage_graph', 'figure'),
          ], 
         [Input('commissie-dropdown-per-party', 'value'),
          Input('date-range-per-party', 'start_date'),
@@ -509,8 +517,10 @@ def register_callbacks(app):
         filtered_df_overview, filtered_df_meetings = filter_data(
         start_date, end_date, commission_value,
         commissions_overview_df, meetings_all_commissions_df)
+		
+		# Obtain count of relevant data, after filtering
+        amount_meetings = len(filtered_df_meetings)
         
-
         
         # # update table
         # table = update_table(filtered_df_overview)
@@ -528,7 +538,9 @@ def register_callbacks(app):
         attendance_per_party_percentage_graph = update_attendance_per_party_graph(attendance_per_party_percentage_df)
         
         
-        return [attendance_per_party_percentage_table, attendance_per_party_percentage_graph]
+        return [f"Deze selectie resulteert in {amount_meetings} relevante vergaderingen.", # Use text formatting to allow easier build of layout
+				attendance_per_party_percentage_table, 
+				attendance_per_party_percentage_graph]
 
    
 ## Comment in integrated approach
