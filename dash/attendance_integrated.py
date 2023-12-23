@@ -22,12 +22,16 @@ app.layout = html.Div([
             ),
             # Description
             html.P(
-                children=(
-                    "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
-                    ),
+                children=[
+                    "Het Vlaams Parlement geeft op haar ",
+                    html.A("website", href="https://www.vlaamsparlement.be/nl/parlementair-werk/plenaire-vergadering/vergaderingen", target="_blank"),
+                    " een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een ",
+                    html.A("API", href="https://ws.vlpar.be/e/opendata/api/", target="_blank"),
+                    ". Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+                ],
                 className="header-description",
                 style={"color": "#FFFFFF"}
-            ),
+            )
         ],
         className="section-header",
         style={"background-color": "#222222"} # Set dark background for this section
