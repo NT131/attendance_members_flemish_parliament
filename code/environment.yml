@@ -1,0 +1,9 @@
+name: attendance_members_flemish_parliament
+channels:
+- defaults
+dependencies:
+- python
+- pandas
+- numpy
+- matplotlib
+- notebook
