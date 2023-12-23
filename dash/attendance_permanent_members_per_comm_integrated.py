@@ -1,6 +1,7 @@
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output
+from dash import dash_table
 
 try:
     import dash_bootstrap_components as dbc #to use .Col feature for displaying multiple pie charts
@@ -9,6 +10,8 @@ except:
 
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
+
+from collections import Counter
 
 import pandas as pd
 
@@ -273,13 +276,36 @@ layout = html.Div(
                 ),
                 html.Div(
                     children=[
-                        html.Div(id='graphs_container'),  # Pie chart container
-                        html.Div(id='dummy-trigger', style={'display': 'none'})  # Dummy component for update
+                        html.Div(
+                            # Wrapper for both graph and table
+                            children=[
+                                # Graph attendance per commission
+                                html.Div(
+                                    children=[
+                                        html.Div(id='graphs_container'),  # Pie chart container
+                                        html.Div(id='dummy-trigger', style={'display': 'none'})  # Dummy component for update
+                                    ],
+                                    className="graph-title",
+                                ),
+                                # Table attendance_per_commission
+                                html.Div(
+                                    className="table-container",
+                                    children=[
+                                        html.Div(
+                                            # Display the table_attendance
+                                            id='table_attendance',
+                                            className="dash-table",
+                                            children=html.P("Tabel niet beschikbaar", style={"color": "red"})
+                                        ),
+                                    ]
+                                ),
+                            ],
+                            style={"display": "flex", "flex-direction": "row"} # Set flexbox layout for row dispay to allow table and graph next to each other     
+                        ),          
                     ],
-                    className="graph-title",
+                    className="wrapper",
                 ),
             ],
-            className="wrapper",
         ),
     ],
     # use CSS flexbox approach to easily structure graphs and titles
@@ -396,6 +422,42 @@ def update_pie_charts(selected_data):
 
     return graphs
 
+def update_table(df):
+   
+    # Create table header
+    table_header = [html.Tr([html.Th(col) for col in df.columns])]
+
+    # Create table rows using list comprehension
+    table_rows = [
+        html.Tr([html.Td(df.iloc[i][col]) for col in df.columns])
+        for i in range(len(df))
+    ]
+
+    # Assemble the complete table with header and rows
+    table = html.Table(table_header + table_rows, className='table')
+
+    return table  # Return a list containing the table element
+
+
+def update_dash_table(df):
+   
+    # # Create table header
+    # table_header = [html.Tr([html.Th(col) for col in df.columns])]
+
+    # # Create table rows using list comprehension
+    # table_rows = [
+    #     html.Tr([html.Td(df.iloc[i][col]) for col in df.columns])
+    #     for i in range(len(df))
+    # ]
+
+    # # Assemble the complete table with header and rows
+    # table = html.Table(table_header + table_rows, className='table')
+    
+    # Convert DataFrame to Dash DataTable
+    datatable = dash_table.DataTable(data=df.to_dict('records'))
+
+    return datatable  # Return a list containing the table element
+
 #Create function to load app in integrated appraoch
 def register_callbacks(app):
 
@@ -404,6 +466,7 @@ def register_callbacks(app):
         [
 		Output('amount_meetings_per_com', 'children'),
 		Output('graphs_container', 'children'),
+        Output('table_attendance', 'children')
 		],
         [Input('commissie-dropdown-per-com', 'value'),
          Input('date-range-per-com', 'start_date'),
@@ -417,12 +480,25 @@ def register_callbacks(app):
         
 		# Obtain count of relevant data, after filtering
         amount_meetings_per_com = len(filtered_df_meetings)
+        
+        # Obtain table including the attendance counts of the permanent members, 
+        # using the Counter objects in the column 'aanwezig_count_vaste' of filtered_df_overview
+        attendance_permanent_df = attendance_statistics.obtain_counter_from_list_counter_likes(
+            filtered_df_overview['aanwezig_count_vaste'], ['Naam vast lid', 'Aantal keer aanwezig'])
+    
+        # Generate htlm table
+            # Option 1: use normal table
+        # table_attendance = update_table(attendance_permanent_df) 
+            # Option 2: use dash_table
+        table_attendance = update_dash_table(attendance_permanent_df)
+
 
     	# Update the pie charts based on the selected data
         pie_charts = update_pie_charts(filtered_df_overview)
         
         return [f"Deze selectie resulteert in {amount_meetings_per_com} relevante vergaderingen.", # Use text formatting to allow easier build of layout
-				pie_charts  # Return the list of graphs as children of graphs_container
+				pie_charts,  # Return the list of graphs as children of graphs_container
+                table_attendance
 			   ]
        
     
