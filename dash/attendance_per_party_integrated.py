@@ -38,7 +38,7 @@ dropdown_options_commission = [{"label": "Alle commissies", "value": "Alle commi
 dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}] + [{"label": party, "value": party} for party in fracties_dict.keys()] 
 
 # Create a default value for amount_meetings, i.e. relevant meetings
-amount_meetings = len(meetings_all_commissions_df)  # Set amount of all meetings as default, it will be updated in the callback
+amount_meetings_per_party = len(meetings_all_commissions_df)  # Set amount of all meetings as default, it will be updated in the callback
 
 
 # Build app
@@ -234,8 +234,8 @@ layout = html.Div(
                             className="menu-element"
                         ),
 						# Display impact of data selection (i.e. how many meetings are taken into account)	
-						html.Div(id='amount_meetings',
-								children=f"Deze selectie resulteert in {amount_meetings} relevante vergaderingen."), 
+						html.Div(id='amount_meetings_per_party',
+								children=f"Deze selectie resulteert in {amount_meetings_per_party} relevante vergaderingen."), 
                     ], 
                     className="section-chart",
                 ),
@@ -504,7 +504,7 @@ def register_callbacks(app):
     # Define callback to update display based on selected commission and date range
     @app.callback(
         [
-        Output('amount_meetings', 'children'),
+        Output('amount_meetings_per_party', 'children'),
 	   	Output('attendance_per_party_percentage_table', 'children'),
         Output('attendance_per_party_percentage_graph', 'figure'),
          ], 
@@ -519,7 +519,7 @@ def register_callbacks(app):
         commissions_overview_df, meetings_all_commissions_df)
 		
 		# Obtain count of relevant data, after filtering
-        amount_meetings = len(filtered_df_meetings)
+        amount_meetings_per_party = len(filtered_df_meetings)
         
         
         # # update table
@@ -538,7 +538,7 @@ def register_callbacks(app):
         attendance_per_party_percentage_graph = update_attendance_per_party_graph(attendance_per_party_percentage_df)
         
         
-        return [f"Deze selectie resulteert in {amount_meetings} relevante vergaderingen.", # Use text formatting to allow easier build of layout
+        return [f"Deze selectie resulteert in {amount_meetings_per_party} relevante vergaderingen.", # Use text formatting to allow easier build of layout
 				attendance_per_party_percentage_table, 
 				attendance_per_party_percentage_graph]
 

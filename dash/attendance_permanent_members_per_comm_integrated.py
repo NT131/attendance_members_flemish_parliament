@@ -42,6 +42,10 @@ with open(f'../data/parlementsleden.pkl', 'rb') as file:
 dropdown_options_commission = [{"label": "Alle commissies", "value": "Alle commissies"}] + [{'label': item, 'value': item} for item in diff_commissions]
 dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}] + [{"label": party, "value": party} for party in fracties_dict.keys()] 
 
+# Create a default value for amount_meetings, i.e. relevant meetings
+amount_meetings_per_com = len(meetings_all_commissions_df)  # Set amount of all meetings as default, it will be updated in the callback
+
+
 # Uncomment in integrated approach
 # # Build app
 # app = dash.Dash(__name__, assets_folder='assets') # Relative path to the folder of css file)
@@ -225,6 +229,9 @@ layout = html.Div(
                             ],
                             className="menu-element"
                         ),
+						# Display impact of data selection (i.e. how many meetings are taken into account)	
+						html.Div(id='amount_meetings_per_com',
+								 children=f"Deze selectie resulteert in {amount_meetings_per_com} relevante vergaderingen."), 
                     ], 
                     className="section-chart",
                 ),
@@ -377,7 +384,10 @@ def register_callbacks(app):
 
     # Define callback to update display based on selected commission and date range
     @app.callback(
-        Output('graphs_container', 'children'),
+        [
+		Output('amount_meetings_per_com', 'children'),
+		Output('graphs_container', 'children'),
+		],
         [Input('commissie-dropdown-per-com', 'value'),
          Input('date-range-per-com', 'start_date'),
          Input('date-range-per-com', 'end_date')]
@@ -388,12 +398,15 @@ def register_callbacks(app):
         start_date, end_date, commission_value,
         commissions_overview_df, meetings_all_commissions_df)
         
+		# Obtain count of relevant data, after filtering
+        amount_meetings_per_com = len(filtered_df_meetings)
 
-
-    # Update the pie charts based on the selected data
+    	# Update the pie charts based on the selected data
         pie_charts = update_pie_charts(filtered_df_overview)
         
-        return pie_charts  # Return the list of graphs as children of graphs_container
+        return [f"Deze selectie resulteert in {amount_meetings_per_com} relevante vergaderingen.", # Use text formatting to allow easier build of layout
+				pie_charts  # Return the list of graphs as children of graphs_container
+			   ]
        
     
 # Comment in integrated approach   

@@ -36,8 +36,12 @@ with open(f'../data/fracties.pkl', 'rb') as file:
 with open(f'../data/parlementsleden.pkl', 'rb') as file:
     parlementsleden_all_dict = pickle.load(file)
 
-
+# Create a list of options for the dropdown
 dropdown_options_party  = [{"label": "Alle partijen", "value": "Alle partijen"}] + [{"label": party, "value": party} for party in fracties_dict.keys()] 
+
+# Create a default value for amount_meetings, i.e. relevant meetings
+amount_meetings_per_member = len(meetings_all_commissions_df)  # Set amount of all meetings as default, it will be updated in the callback
+
 
 ## Comment in integrated approach
 # # Build app
@@ -100,6 +104,8 @@ layout = html.Div(
                     ],
                     className="menu-element"
                 ),
+				html.Div(id='amount_meetings_per_member',
+						 children=f"Deze selectie resulteert in {amount_meetings_per_member} relevante vergaderingen."), 
             ],
             className="section-header",
         ),
@@ -518,6 +524,7 @@ def register_callbacks(app):
     # Update display
     @app.callback(
         [
+			Output('amount_meetings_per_member', 'children'),
             Output("permanent_member_amount_meetings_df_graph", "figure"),
             Output("non_permanent_member_amount_meetings_df_graph", "figure"),
             # Output("member_amount_meetings_df_table", "children")
@@ -534,6 +541,9 @@ def register_callbacks(app):
             start_date, end_date, party_value, commissions_overview_df, meetings_all_commissions_df
         )
         
+		# Obtain count of relevant data, after filtering
+        amount_meetings_per_member = len(meetings_all_commissions_filtered_df)
+		
         # Obtain dict on amount of commissions members are partaking
         name2count_permanent_dict = amount_commissions_as_permanent_dict(filtered_df_overview,
                                                                         parlementsleden_all_dict,fracties_dict)
@@ -564,7 +574,9 @@ def register_callbacks(app):
         # permanent_member_amount_meetings_df_table = update_dash_table(permanent_member_amount_meetings_df, "permanent_member_amount_meetings_df_table")
         # member_amount_meetings_df_table = update_dash_table(non_permanent_member_amount_meetings_df_graph, "non_permanent_member_amount_meetings_df_table")
         
-        return permanent_member_amount_meetings_df_graph, non_permanent_member_amount_meetings_df_graph
+        return [f"Deze selectie resulteert in {amount_meetings_per_member} relevante vergaderingen.", # Use text formatting to allow easier build of layout
+				permanent_member_amount_meetings_df_graph, 
+				non_permanent_member_amount_meetings_df_graph]
         # , member_amount_meetings_df_table
 
 
