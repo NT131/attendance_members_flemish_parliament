@@ -106,7 +106,7 @@ layout = html.Div(
 						),
 						html.Div(
 							# Display the most recent meeting date
-							id='most-recent-date',
+							id='most-recent-date-per-member',
 							children=f"Laatste update: {date_most_recent_meeting_per_member}",
 							style={'font-style': 'italic'}
 						),
