@@ -358,9 +358,9 @@ def update_pie_charts(selected_data):
     if selected_data is not None and len(selected_data) > 0:
         # Data is available for at least one commission
         for index, row in selected_data.iterrows():
-            data_present = row['Gemiddelde aantal aanwezig vaste leden']
-            data_absent = row['Gemiddelde aantal afwezig vaste leden']
-            data_excused = row['Gemiddelde aantal verontschuldigd vaste leden']
+            data_present = row['Gemiddelde aantal aanwezig vaste leden (afgerond)']
+            data_absent = row['Gemiddelde aantal afwezig vaste leden (afgerond)']
+            data_excused = row['Gemiddelde aantal verontschuldigd vaste leden (afgerond)']
 
             if not pd.isnull(data_present) and not pd.isnull(data_absent) and not pd.isnull(data_excused):
                 labels = ['Aanwezig', 'Afwezig', 'Verontschuldigd']
