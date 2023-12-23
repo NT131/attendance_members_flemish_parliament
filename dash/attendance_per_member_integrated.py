@@ -10,6 +10,8 @@ from collections import Counter, defaultdict
 
 import pandas as pd
 from datetime import datetime
+import locale
+
 import pickle
 
 import plotly.express as px # for scatterplots
@@ -17,12 +19,18 @@ import plotly.express as px # for scatterplots
 
 import attendance_statistics # import functions of attendance_statistics.py (i.e. obtain_attendance_statistics() and helper functions)
 
+# Set the locale to Dutch (Belgian)
+locale.setlocale(locale.LC_TIME, 'nl_BE.utf8')  # Set appropriate locale for Dutch
+
 
 # Read in all meetings and attendance (both full (i.e. dict with party and id) and short (i.e. only name)
 relevant_extraction_date = "2023-12-18"
 
 meetings_all_commissions_df = pd.read_pickle(f'../data/meetings_all_commissions_df_{relevant_extraction_date}.pkl')
 meetings_all_commissions_short_df = pd.read_pickle(f'../data/meetings_all_commissions_short_df_{relevant_extraction_date}.pkl')
+
+# Obtain date of most recent meeting in dataset + format to e.g. "15 februari 2023"
+date_most_recent_meeting_per_member = meetings_all_commissions_df['Datum vergadering'].max().strftime('%d %B %Y')
 
 # Obtain list of available commissions in dataframe
 diff_commissions = list(set(meetings_all_commissions_df["commissie.titel"]))
@@ -92,8 +100,17 @@ layout = html.Div(
                 ),
                 html.Div(
                     children=[
-                        html.Div("Relevante periode", className="menu-title"),
-                        dcc.DatePickerRange(
+                        html.Div(
+							"Relevante periode", 
+							className="menu-title"
+						),
+						html.Div(
+							# Display the most recent meeting date
+							id='most-recent-date',
+							children=f"Laatste update: {date_most_recent_meeting_per_member}",
+							style={'font-style': 'italic'}
+						),
+						dcc.DatePickerRange(
                             id="date-range-per-member",
                             min_date_allowed=meetings_all_commissions_df["Datum vergadering"].min(),
                             max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
@@ -104,9 +121,15 @@ layout = html.Div(
                     ],
                     className="menu-element"
                 ),
-				html.Div(id='amount_meetings_per_member',
-						 children=f"Deze selectie resulteert in {amount_meetings_per_member} relevante vergaderingen."), 
-            ],
+				# Display impact of data selection (i.e. how many meetings are taken into account)	
+				html.Div(
+					children=[
+						html.Div(id='amount_meetings_per_member',
+								 children=f"Deze selectie resulteert in {amount_meetings_per_member} relevante vergaderingen."), 
+					],
+					className="menu-element"
+				),
+			],
             className="section-header",
         ),
 
