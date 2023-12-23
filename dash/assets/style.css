@@ -263,4 +263,27 @@ body {
     word-wrap: break-word;
 }
 
+/* Add styling for the footer */
+.footer {
+    /* Your styles for the footer */
+    font-size: 14px;
+    color: #333; /* Example color */
+    max-width: 800px; /* Set a maximum width */
+    margin: 0 auto; /* Center the footer */
+    padding: 20px; /* Add padding for better spacing */
+    /* Add more styles as needed */
+}
+
+.footer a {
+    /* Styling for the hyperlink within the footer */
+    color: #007bff; /* Example color */
+    text-decoration: none;
+    /* Add more styles as needed */
+}
+
+.footer a:hover {
+    /* Styling for the hyperlink on hover */
+    text-decoration: underline;
+    /* Add more styles as needed */
+}
 
