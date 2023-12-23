@@ -23,6 +23,33 @@ def obtain_attendance_counter(DataFrame_column_attendance):
 
     return sorted_counts  
 
+def round_numbers(lst):
+	"""
+	Define function to round the presence amounts to integers, taking into account the original total. 
+	This avoids that the runding results for some commissions in 16 or 14 members instaed of 15.
+
+	"""
+    #See https://stackoverflow.com/questions/792460/how-to-round-floats-to-integers-while-preserving-their-sum
+    # Calculate the fractional parts and their sum
+    fractional_parts = [x - int(x) for x in lst]
+    fractional_sum = sum(fractional_parts) 
+
+    # Calculate the whole number parts
+    whole_numbers = [int(x) for x in lst]
+    
+    # Distribute the fractional sum among the whole numbers
+    sorted_indices = sorted(range(len(fractional_parts)), key=lambda k: -fractional_parts[k])
+    remaining = int(round(fractional_sum))
+
+    
+    for idx in sorted_indices:
+        if remaining <= 0:
+            break
+        whole_numbers[idx] += 1
+        remaining -= 1
+
+    return whole_numbers
+
 def obtain_attendance_statistics(commissions_overview_df_input, meetings_all_commissions_df_input):
     # ***************************************************************************************
     # Obtain average presence for all meetings of each commission (for both alle and vaste leden)
@@ -70,7 +97,52 @@ def obtain_attendance_statistics(commissions_overview_df_input, meetings_all_com
                                           'Gemiddelde aantal verontschuldigd vaste leden']):
                 commissions_overview_df_input.loc[index_overview, col_name_overview] = average_relevant_counts_attendance.iloc[i]
     
-    
+	
+	
+    		# Obtaining averages
+			# Creating empty lists to fill
+			averages_alle_rounded = []
+			averages_vaste_rounded = []
+			# Iterate over all averages
+			for i, col_name_overview in enumerate(['Gemiddelde aantal aanwezig alle leden', 'Gemiddelde aantal afwezig alle leden',
+                                          'Gemiddelde aantal verontschuldigd alle leden',
+                                          'Gemiddelde aantal aanwezig vaste leden', 'Gemiddelde aantal afwezig vaste leden',
+                                          'Gemiddelde aantal verontschuldigd vaste leden']):
+				# Obtain list of averages for all members and for permanent members
+				averages_all_members = commissions_overview_df_input.loc[index_overview, 
+																		 ['Gemiddelde aantal aanwezig alle leden', 
+																		  'Gemiddelde aantal afwezig alle leden',
+																		  'Gemiddelde aantal verontschuldigd alle leden']
+																		]
+				averages_permanent_members = commissions_overview_df_input.loc[index_overview,
+																			   ['Gemiddelde aantal aanwezig vaste leden', 
+																				'Gemiddelde aantal afwezig vaste leden',
+																				'Gemiddelde aantal verontschuldigd vaste leden']
+																			   ]
+				
+				# if numpy array: apply rounding function, if not (i.e. is NaN), maintain. Append result
+				averages_alle_rounded.append(round_numbers(averages_all_members) if isinstance(averages_all_members, np.ndarray) else averages_all_members)
+				averages_vaste_rounded.append(round_numbers(averages_permanent_members) if isinstance(averages_permanent_members, np.ndarray) else averages_permanent_members)
+
+			# Extracting items into separate lists
+			averages_alle_rounded_present = [sublist[0] for sublist in averages_alle_rounded]
+			averages_alle_rounded_absent = [sublist[1] for sublist in averages_alle_rounded]
+			averages_alle_rounded_absent_with_notice = [sublist[2] for sublist in averages_alle_rounded]
+			
+			averages_vaste_rounded_present = [sublist[0] for sublist in averages_vaste_rounded]
+			averages_vaste_rounded_absent = [sublist[1] for sublist in averages_vaste_rounded]
+			averages_vaste_rounded_absent_with_notice = [sublist[2] for sublist in averages_vaste_rounded]
+			
+			# Add lists to dataframe
+			commissions_overview_df_input['Gemiddelde aantal aanwezig alle leden (afgerond)'] = averages_alle_rounded_present
+			commissions_overview_df_input['Gemiddelde aantal afwezig alle leden (afgerond)'] = averages_alle_rounded_absent
+			commissions_overview_df_input['Gemiddelde aantal verontschuldigd alle leden (afgerond)'] = averages_alle_rounded_absent_with_notice
+			
+			commissions_overview_df_input['Gemiddelde aantal aanwezig vaste leden (afgerond)'] = averages_vaste_rounded_present
+			commissions_overview_df_input['Gemiddelde aantal afwezig vaste leden (afgerond)'] = averages_vaste_rounded_absent
+			commissions_overview_df_input['Gemiddelde aantal verontschuldigd vaste leden (afgerond)'] = averages_vaste_rounded_absent_with_notice
+
+				
     
     return (commissions_overview_df_input)
     
