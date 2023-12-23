@@ -45,9 +45,12 @@ app.layout = html.Div([
         ]
 	),
 	# Footer with hyperlink to GitHub
-	html.Footer(["De code en data voor deze toepassing is beschikbaar op ",
-				 html.A("GitHub", href="https://github.com/NT131/attendance_members_flemish_parliament")
-				]
+	html.Footer(
+		className='footer', # Assign a class name for styling
+		children=[
+			"De code en data voor deze toepassing is beschikbaar op ",
+			html.A("GitHub", href="https://github.com/NT131/attendance_members_flemish_parliament")
+		]
 	),
 ])
 
