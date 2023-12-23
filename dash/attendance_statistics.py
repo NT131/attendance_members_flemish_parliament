@@ -152,3 +152,31 @@ def count_member_occurrence(attendance_list: list):
     sorted_counts = sorted(element_counts.items(), key=lambda x: x[1], reverse=True)
 
     return sorted_counts
+
+def obtain_counter_from_list_counter_likes(input_list, column_names_list):
+	"""
+	Obtain a sorted dataframe of a list or series of Counter-like objects.
+	
+	Example input:
+		0     [(Wim Verheyden, 33), (Leo Pieters, 33), (Robr...
+		1     [(Arnout Coel, 70), (Björn Rzoska, 69), (Phili...
+		2     [(Kris Van Dijck, 83), (Nadia Sminate, 76), (B...
+		3     [(Els Sterckx, 47), (Karl Vanlouwe, 41), (Jan ...
+		4     [(Cathy Coudyser, 67), (Johan Deckmyn, 65), (A...
+		5     [(Karin Brouwers, 103), (Marius Meremans, 94),...
+
+	"""
+	
+	# Initialize an empty Counter
+	overall_counter = Counter()
+
+	# Iterate through the list of lists and aggregate counts
+	for sublist in input_list:
+		for name, count in sublist:
+			overall_counter[name] += count
+	
+	# Convert Counter to dataframe 
+	overall_df = pd.DataFrame(list(overall_counter.items()),
+							  columns=column_names_list)
+			
+	return overall_df.sort_values(by='Aantal keer aanwezig', ascending=False)
