@@ -342,8 +342,8 @@ commissions_overview_df, meetings_all_commissions_df):
     
     # Obtain for the filtered df the attendance statistics using imported function
     filtered_df_overview = attendance_statistics.obtain_attendance_statistics(
-    commissions_overview_df_input = commissions_overview_filtered_df, 
-    meetings_all_commissions_df_input = meetings_all_commissions_filtered_df
+		commissions_overview_df_input = commissions_overview_filtered_df, 
+		meetings_all_commissions_df_input = meetings_all_commissions_filtered_df
     )
     
     # print(filtered_df_overview)
