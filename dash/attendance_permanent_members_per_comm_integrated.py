@@ -70,121 +70,6 @@ amount_meetings_per_com = len(meetings_all_commissions_df)  # Set amount of all 
 # app.
 
 
-# layout = html.Div(  
-    # children=[
-        # # # Header section
-        # # html.Div(
-            # # children=[
-                # # # Title
-                # # html.H1(
-                    # # children="Aanwezigheid Vlaamse parlementsleden",
-                    # # className="header-title",
-                    # # style={"color": "#FFFFFF"}
-                # # ),
-                # # # Description
-                # # html.P(
-                    # # children=(
-                        # # "Het Vlaams Parlement geeft op haar website een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een API. Onderstaande visualisaties laten toe om met deze gegevens te interageren."
-                        # # ),
-                    # # className="header-description",
-                    # # style={"color": "#FFFFFF"}
-                # # ),
-            # # ],
-            # # className="section-header",
-            # # style={"background-color": "#222222"} # Set dark background for this section
-        # # ),
-        # # Gemiddelde aanwezigheid vaste leden in commissie + alle leden per partij
-        # html.Div(
-            # children=[
-                # # Header
-                # html.Div(
-                    # children=[
-                        # html.H2(
-                            # "Aanwezigheid van parlementsleden per commissie",
-                            # className="header-subtitle",
-                        # ),
-                    # ],
-                    # className="section-header",
-                # ),
-                # # Selecting relevant data
-                # html.Div(
-                    # children=[
-                        # html.H3(
-                            # "Selecteer de relevante commissie(s) en de periode.",
-                            # className="header-subsubtitle",
-                        # ),
-                        # # Dropdown to select commission
-                        # html.Div(
-                            # children=[
-                                # html.Div(
-                                    # children="Welke commissie?", 
-                                    # className="menu-title"
-                                # ),
-                                # dcc.Dropdown(
-                                    # id='commissie-dropdown-per-com',
-                                    # options=dropdown_options_commission,
-                                    # value="Alle commissies", # default value
-                                    # clearable=False,
-                                    # className="dropdown",
-                                # ),
-                            # ],
-                            # className="menu-element" 
-                        # ),
-                        # # Datepicker to select relevant timeframe
-                        # html.Div(
-                            # children=[
-                                # html.Div(
-                                    # children="Relevante periode", 
-                                    # className="menu-title"
-                                # ),
-                                # dcc.DatePickerRange(
-                                    # id="date-range-per-com",
-                                    # min_date_allowed=meetings_all_commissions_df["Datum vergadering"].min(),
-                                    # max_date_allowed=meetings_all_commissions_df["Datum vergadering"].max(),
-                                    # start_date=meetings_all_commissions_df["Datum vergadering"].min(),
-                                    # end_date=meetings_all_commissions_df["Datum vergadering"].max(),
-                                # ),
-                            # ],
-                            # className="menu-element"
-                        # ),
-                    # ], 
-                    # className="section-chart",
-                # ),
-                # # "Gemiddelde aanwezigheid vaste leden in commissies"
-                # html.Div(
-                    # children=[
-                        # # Header
-                        # html.Div(
-                            # children=[
-                                # html.H3(
-                                    # "Gemiddelde aanwezigheid vaste leden in commissies",
-                                    # className="header-subsubtitle",
-                                # ),
-                                # html.P(
-                                    # children=(
-                                        # "Hoeveel vergaderingen wonen parlementsleden bij van commissies waarvan ze vast lid zijn?"
-                                    # ),
-                                    # className="header-description",
-                                # ),
-                            # ],
-                            # className="section-header",
-                            # ),
-                        # # Pie chart
-                        # html.Div([
-                            # html.Div(id='graphs_container'),
-                            # # Add a dummy component to trigger the update
-                            # html.Div(id='dummy-trigger', style={'display': 'none'})
-                            # ],
-                            # className="graph-title",  # Allow word wrapping in titles
-                        # ),
-                     # ]
-                # ),       
-            # ],
-            # className="wrapper",
-        # ),
-    # ]
-# )
-
 layout = html.Div(  
     children=[
         html.Div(
@@ -394,31 +279,7 @@ def update_pie_charts(selected_data):
                     className="no-data-message"
                 )
                 graphs.append(message)
-                
-                # graphs.append(dcc.Graph(
-                    # id=row['commissie.titel'],
-                    # figure=go.Scatter(
-                        # x=[],
-                        # y=[],
-                        # mode='text',
-                        # text=[f"Onvoldoende data beschikbaar voor {row['commissie.titel']}"],
-                        # name=row['commissie.titel'],
-                        # textposition='top center',
-                        # showlegend=False
-                    # )
-                # ))
-    # else:  # No data is available for any commission
-        # graphs.append(dcc.Graph(
-            # id='no_data_graph',
-            # figure=go.Scatter(
-                # x=[],
-                # y=[],
-                # mode='text',
-                # text=["Geen data beschikbaar voor alle commissies"],
-                # textposition='top center',
-                # showlegend=False
-            # )
-        # ))
+
 
     return graphs
 
@@ -440,20 +301,7 @@ def update_table(df):
 
 
 def update_dash_table(df):
-   
-    # # Create table header
-    # table_header = [html.Tr([html.Th(col) for col in df.columns])]
 
-    # # Create table rows using list comprehension
-    # table_rows = [
-    #     html.Tr([html.Td(df.iloc[i][col]) for col in df.columns])
-    #     for i in range(len(df))
-    # ]
-
-    # # Assemble the complete table with header and rows
-    # table = html.Table(table_header + table_rows, className='table')
-    
-    # Convert DataFrame to Dash DataTable
     datatable = dash_table.DataTable(data=df.to_dict('records'))
 
     return datatable  # Return a list containing the table element
