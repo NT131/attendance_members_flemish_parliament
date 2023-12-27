@@ -235,6 +235,8 @@ commissions_overview_df, meetings_all_commissions_df):
     return (filtered_df_overview, meetings_all_commissions_filtered_df)
     
     
+
+
 # Update function for pie charts
 def update_pie_charts(selected_data):
     graphs = []  # List to store individual pie charts
@@ -248,21 +250,24 @@ def update_pie_charts(selected_data):
             data_excused = row['Gemiddelde aantal verontschuldigd vaste leden (afgerond)']
 
             if not pd.isnull(data_present) and not pd.isnull(data_absent) and not pd.isnull(data_excused):
-                labels = ['Aanwezig', 'Afwezig', 'Verontschuldigd']
+                labels = ['aanwezig', 'afwezig', 'verontschuldigd']
                 sizes = [data_present, data_absent, data_excused]
                 colors = ['green', 'red', 'orange']
 
-                # Create a pie chart trace
+                # Create a custom hovertemplate without mentioning 'trace 0'
+                hovertemplate = "<b>aantal leden</b>: %{value}"
+
+                # Create the Pie chart directly with the custom hovertemplate
                 pie_chart = go.Pie(
                     labels=labels,
                     values=sizes,
-                    textinfo='percent',
-                    hovertemplate="<b>aantal leden: %{value}</b>",  # see https://plotly.com/python/hover-text-and-formatting/
-                    # hoverinfo='value',
+                    textinfo='percent',  # Display percentages by default
+                    hoverinfo='label+percent+value',  # Include necessary hover information
+                    hovertemplate=hovertemplate,  # Define hover template
                     hole=0.3,
-                    marker=dict(colors=colors),
-                    name=row['commissie.titel']
+                    marker=dict(colors=colors)
                 )
+
                 fig = go.Figure(data=[pie_chart])
 
                 fig.update_layout(
@@ -280,8 +285,10 @@ def update_pie_charts(selected_data):
                 )
                 graphs.append(message)
 
-
     return graphs
+
+
+
 
 def update_table(df):
    
