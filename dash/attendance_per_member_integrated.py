@@ -447,6 +447,7 @@ def update_graph_bar(df_input):
     return figure
 
 
+
 # Create scatter plot for permanent members
 def update_graph_scatter_permanent(df_input):
     hover_text = (
@@ -454,7 +455,6 @@ def update_graph_scatter_permanent(df_input):
             lambda row: (
                 f"<b>{row.name}</b> was in de huidige periode <br>"
                 f"op een totaal van {row['Aantal relevante vergaderingen']} vergaderingen <br>"
-                # show int instead of float (always x.0) unless NaN: then substitutes 'N/A' in the output instead of trying to convert it to an integer)
                 f"{int(row['Aantal vergaderingen aanwezig']) if not pd.isnull(row['Aantal vergaderingen aanwezig']) else '<i>N/A</i>'} keer aanwezig, "
                 f"{int(row['Aantal vergaderingen afwezig']) if not pd.isnull(row['Aantal vergaderingen afwezig']) else '<i>N/A</i>'} keer afwezig en "
                 f"{int(row['Aantal vergaderingen verontschuldigd']) if not pd.isnull(row['Aantal vergaderingen verontschuldigd']) else '<i>N/A</i>'} keer verontschuldigd. <br>"
@@ -470,22 +470,15 @@ def update_graph_scatter_permanent(df_input):
         x="Percentage vergaderingen aanwezig",
         y="Partij",
         color='Partij',
-        # color=[
-            # party_colors[value]
-            # if not pd.isna(value)
-            # else "#CCCCCC"
-            # for value in df_input["Partij"].iloc
-        # ],
         size="Aantal commissies waarin vast lid",
         custom_data=["Partij"],  # Include party name in custom data for hover label
         title="Aanwezigheid parlementsleden in commissies waarin ze vast lid zijn",
         color_discrete_map=party_colors,  # Define colors for parties
-        # size_max=30,  # Adjust the maximum size of the bubbles
     )
 
     fig.update_traces(
         hovertemplate=(
-            "%{customdata}<br><extra></extra>"
+            "<b>%{customdata}</b><br>"
         ),
         customdata=hover_text,
     )
@@ -495,10 +488,12 @@ def update_graph_scatter_permanent(df_input):
             tickformat=".0%",  # Format y-axis as percentage without decimal
             title="Percentage vergaderingen aanwezig",
         ),
+        hovermode='closest',  # Set hovermode to 'closest'
     )
     
-    
     return fig
+
+
 
 # Create scatter plot for non-permanent members
 def update_graph_scatter_non_permanent(df_input):
