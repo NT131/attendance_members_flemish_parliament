@@ -1,0 +1,291 @@
+ /* ../dash\aanwezigheid\assets */
+
+body {
+    font-family: "Lato", sans-serif;
+    margin: 0;
+    background-color: #F7F7F7;
+}
+
+.header {
+	font-family: 'Lato', sans-serif;
+    background-color: #FFFFFF; /* use light background as default */
+    height: 288px;
+    padding: 16px 0 0 0;
+}
+
+.header-emoji {
+    font-size: 48px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.header-title {
+	font-family: 'Lato', sans-serif;
+    color: #333333; 
+    font-size: 30px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* Style for the subtitle */
+.header-subtitle {
+    font-family: 'Lato', sans-serif;
+    color: #666666; /* Adjust color for subtitle */
+    font-size: 25px; /* Adjust font size for subtitle */
+    text-align: center;
+    margin: 10px auto; /* Adjust margin for subtitle */
+}
+
+/* Style for the subtitle */
+.header-subsubtitle {
+    font-family: 'Lato', sans-serif;
+    color: #666666; /* Adjust color for subtitle */
+    font-size: 20px; /* Adjust font size for subtitle */
+    text-align: center;
+    margin: 10px auto; /* Adjust margin for subtitle */
+}
+
+.header-description {
+	font-family: 'Lato', sans-serif;
+    margin: 4px auto;
+    text-align: center;
+    max-width: 384px;
+}
+
+.wrapper {
+	font-family: 'Lato', sans-serif;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1024px;
+    padding-right: 10px;
+    padding-left: 10px;
+	padding-bottom: 20px; /* avoid wrapper with e.g. table pushed to bottom edge of page */
+    margin-top: 32px;
+}
+
+.card {
+	font-family: 'Lato', sans-serif;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+	width: 100%; /* Adjust the width to fill the available space */
+    padding: 20px; /* Example padding */
+}
+
+.menu {
+	font-family: 'Lato', sans-serif;
+    height: 180px;  /* Extend if need be, e.g. when expanding amount of menus*/
+    width: 912px;
+    display: flex;
+    justify-content: space-evenly; 
+    padding-top: 24px;
+    margin: -80px auto 0 auto;
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+
+.Select-control {
+    width: 256px;
+    height: 48px;
+	/* height: auto; */
+}
+
+.Select--single>.Select-control .Select-value,
+.Select-placeholder {
+    line-height: 48px;
+}
+
+.Select--multi .Select-value-label {
+    line-height: 32px;
+	/* line-height: auto; */
+}
+
+.menu-title {
+	font-family: 'Lato', sans-serif;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #079A82;
+}
+
+/* Style for the table */
+.table {
+    font-family: 'Lato', sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: auto; /* Adjusts column width based on content */
+}
+
+/* Style for table header */
+.table th {
+    font-family: 'Lato', sans-serif;
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px; /* Increased padding for header */
+    border-bottom: 2px solid #ddd; /* Adding a bottom border for separation */
+}
+
+/* Alternate row colors for better readability */
+.table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style for table cells */
+.table td {
+    font-family: 'Lato', sans-serif;
+    border: 1px solid #ddd; /* Slight lighter border color */
+    text-align: left;
+    padding: 10px; /* Adjusted cell padding */
+    white-space: nowrap; /* Prevents word wrapping */
+}
+
+
+/* Align the last three columns to the right */
+/*table td:nth-last-child(-n+3) { */
+ /*   text-align: right; */
+/*} */
+
+
+/* Align the last three columns to the right */
+.table-container .table td:nth-last-child(-n+8) {
+    text-align: right;
+}
+
+/* Hover effect for better interactivity */
+.table tr:hover {
+    background-color: #f5f5f5; /* Lighter color on hover */
+}
+
+/* Style for the table */
+.dash-table {
+    font-family: 'Lato', sans-serif !important; /* Add 'important' tag to ensure precedence over other possible settings */
+    width: 100%;
+    table-layout: auto; /* Adjusts column width based on content */
+    border-collapse: collapse;
+}
+
+/* Style for table header */
+.dash-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px; /* Increased padding for header */
+    border-bottom: 2px solid #ddd; /* Adding a bottom border for separation */
+}
+
+/* Alternate row colors for better readability */
+.dash-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style for table cells */
+.dash-table td {
+    border: 1px solid #ddd; /* Slight lighter border color */
+    text-align: left;
+    padding: 10px; /* Adjusted cell padding */
+    white-space: nowrap; /* Prevents word wrapping */
+}
+
+/* /* Align the last three columns to the right */ */
+/* .dash-table td:nth-last-child(-n+3) { */
+    /* text-align: right; */
+/* } */
+
+/* /* Align the last eight columns to the right */ */
+/* .dash-table td:nth-last-child(-n+8) { */
+    /* text-align: right; */
+/* } */
+
+/* Hover effect for better interactivity */
+.dash-table tr:hover {
+    background-color: #f5f5f5; /* Lighter color on hover */
+}
+
+
+
+/* Section for the header */
+.section-header {
+    font-family: 'Lato', sans-serif;
+    background-color: #FFFFFF; /* use light background as default */
+    /* height: 150px; */
+    padding: 16px 16px 16px 16px; /*ensure padding of text, instead of fixed height setting */
+}
+
+.section-header .header-title {
+    color: #000000; /* Set the text color to black */
+    font-size: 48px;
+    font-weight: bold;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.section-header .header-description {
+    color: #000000; /* Set the text color to black */
+    margin: 4px auto;
+    text-align: center;
+    max-width: 884px;
+}
+
+/* Section for the pie chart and filters */
+.section-chart {
+    font-family: 'Lato', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+    margin-top: 10px; /* Adjust this margin to move the chart box closer to the menu */
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.18);
+}
+/* Set margins for box holding dropdowns */
+.section-chart .menu-element {
+    margin-bottom: 20px;
+	margin-top: 20px;
+	margin-left: 20px;
+	margin-right: 20px;
+}
+
+/* Set settings for menu titles */
+.section-chart .menu-element .menu-title {
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #079A82;
+}
+
+/* Set dimensions of dropdowns */
+.section-chart .menu-element .dropdown .Select-control {
+    min-width: 800px; /* Adjust the minimum width for the dropdown when active */
+    width: auto; /* Reset fixed width */
+	min-height: 38px; /* Allow the height to adjust based on content */
+    height: auto; /* Reset the fixed height */
+}
+/* Ensure graph titles in pie charts are wrapped */
+.graph-title {
+    word-wrap: break-word;
+}
+
+/* Add styling for the footer */
+.footer {
+    /* Your styles for the footer */
+    font-size: 14px;
+    color: #333; /* Example color */
+    max-width: 800px; /* Set a maximum width */
+    margin: 0 auto; /* Center the footer */
+    padding: 20px; /* Add padding for better spacing */
+    /* Add more styles as needed */
+}
+
+.footer a {
+    /* Styling for the hyperlink within the footer */
+    color: #007bff; /* Example color */
+    text-decoration: none;
+    /* Add more styles as needed */
+}
+
+.footer a:hover {
+    /* Styling for the hyperlink on hover */
+    text-decoration: underline;
+    /* Add more styles as needed */
+}
+

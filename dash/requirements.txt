@@ -1,0 +1,6 @@
+# name environment: aanwezigheid-vlaams-parlement_env
+numpy
+pandas
+dash
+dash-bootstrap-components
+gunicorn

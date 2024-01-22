@@ -1,0 +1,152 @@
+[2024-01-19 09:50:44 +0100] [2043] [INFO] Starting gunicorn 21.2.0
+[2024-01-19 09:50:44 +0100] [2043] [INFO] Listening at: http://0.0.0.0:5002 (2043)
+[2024-01-19 09:50:44 +0100] [2043] [INFO] Using worker: sync
+[2024-01-19 09:50:44 +0100] [2044] [INFO] Booting worker with pid: 2044
+[2024-01-19 09:50:44 +0100] [2044] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+    worker.init_process()
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+    self.load_wsgi()
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+    self.wsgi = self.app.wsgi()
+                ^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+                    ^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+    mod = importlib.import_module(module)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1142, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'attendance_integrated'
+[2024-01-19 09:50:44 +0100] [2044] [INFO] Worker exiting (pid: 2044)
+[2024-01-19 09:50:44 +0100] [2045] [INFO] Booting worker with pid: 2045
+[2024-01-19 09:50:44 +0100] [2045] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+    worker.init_process()
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+    self.load_wsgi()
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+    self.wsgi = self.app.wsgi()
+                ^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+                    ^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+    mod = importlib.import_module(module)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1142, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'attendance_integrated'
+[2024-01-19 09:50:44 +0100] [2045] [INFO] Worker exiting (pid: 2045)
+[2024-01-19 09:50:44 +0100] [2046] [INFO] Booting worker with pid: 2046
+[2024-01-19 09:50:44 +0100] [2046] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/arbiter.py", line 609, in spawn_worker
+    worker.init_process()
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/workers/base.py", line 134, in init_process
+    self.load_wsgi()
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/workers/base.py", line 146, in load_wsgi
+    self.wsgi = self.app.wsgi()
+                ^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+                    ^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+    mod = importlib.import_module(module)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1142, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'attendance_integrated'
+[2024-01-19 09:50:44 +0100] [2046] [INFO] Worker exiting (pid: 2046)
+[2024-01-19 09:50:44 +0100] [2043] [ERROR] Worker (pid:2044) exited with code 3
+[2024-01-19 09:50:44 +0100] [2043] [ERROR] Worker (pid:2045) was sent SIGTERM!
+[2024-01-19 09:50:44 +0100] [2043] [ERROR] Worker (pid:2046) was sent SIGTERM!
+[2024-01-19 09:50:44 +0100] [2043] [ERROR] Shutting down: Master
+[2024-01-19 09:50:44 +0100] [2043] [ERROR] Reason: Worker failed to boot.
+[2024-01-22 13:34:31 +0100] [2182] [INFO] Starting gunicorn 21.2.0
+[2024-01-22 13:34:31 +0100] [2182] [INFO] Listening at: http://0.0.0.0:5002 (2182)
+[2024-01-22 13:34:31 +0100] [2182] [INFO] Using worker: sync
+[2024-01-22 13:34:31 +0100] [2183] [INFO] Booting worker with pid: 2183
+[2024-01-22 13:34:31 +0100] [2184] [INFO] Booting worker with pid: 2184
+[2024-01-22 13:34:31 +0100] [2185] [INFO] Booting worker with pid: 2185
+[2024-01-22 13:34:31 +0100] [2186] [INFO] Booting worker with pid: 2186
+[2024-01-22 13:34:31 +0100] [2187] [INFO] Booting worker with pid: 2187
+[2024-01-22 13:34:31 +0100] [2188] [INFO] Booting worker with pid: 2188
+[2024-01-22 13:34:31 +0100] [2189] [INFO] Booting worker with pid: 2189
+[2024-01-22 13:38:01 +0100] [2186] [INFO] Worker exiting (pid: 2186)
+[2024-01-22 13:38:01 +0100] [2189] [INFO] Worker exiting (pid: 2189)
+[2024-01-22 13:38:01 +0100] [2183] [INFO] Worker exiting (pid: 2183)
+[2024-01-22 13:38:01 +0100] [2182] [INFO] Handling signal: term
+[2024-01-22 13:38:01 +0100] [2184] [INFO] Worker exiting (pid: 2184)
+[2024-01-22 13:38:01 +0100] [2185] [INFO] Worker exiting (pid: 2185)
+[2024-01-22 13:38:01 +0100] [2187] [INFO] Worker exiting (pid: 2187)
+[2024-01-22 13:38:01 +0100] [2188] [INFO] Worker exiting (pid: 2188)
+[2024-01-22 13:38:01 +0100] [2182] [ERROR] Worker (pid:2183) was sent SIGTERM!
+[2024-01-22 13:38:01 +0100] [2182] [ERROR] Worker (pid:2189) was sent SIGTERM!
+[2024-01-22 13:38:05 +0100] [2182] [INFO] Shutting down: Master
+[2024-01-22 13:38:12 +0100] [797] [INFO] Starting gunicorn 21.2.0
+[2024-01-22 13:38:12 +0100] [797] [INFO] Listening at: http://0.0.0.0:5002 (797)
+[2024-01-22 13:38:12 +0100] [797] [INFO] Using worker: sync
+[2024-01-22 13:38:12 +0100] [925] [INFO] Booting worker with pid: 925
+[2024-01-22 13:38:12 +0100] [927] [INFO] Booting worker with pid: 927
+[2024-01-22 13:38:12 +0100] [930] [INFO] Booting worker with pid: 930
+[2024-01-22 13:38:12 +0100] [935] [INFO] Booting worker with pid: 935
+[2024-01-22 13:38:12 +0100] [940] [INFO] Booting worker with pid: 940
+[2024-01-22 13:38:12 +0100] [948] [INFO] Booting worker with pid: 948
+[2024-01-22 13:38:13 +0100] [950] [INFO] Booting worker with pid: 950
+[2024-01-22 13:39:00 +0100] [797] [CRITICAL] WORKER TIMEOUT (pid:927)
+[2024-01-22 13:39:00 +0100] [927] [INFO] Worker exiting (pid: 927)
+[2024-01-22 13:39:01 +0100] [797] [ERROR] Worker (pid:927) was sent SIGKILL! Perhaps out of memory?
+[2024-01-22 13:39:01 +0100] [1967] [INFO] Booting worker with pid: 1967
+[2024-01-22 13:39:13 +0100] [797] [CRITICAL] WORKER TIMEOUT (pid:950)
+[2024-01-22 13:39:13 +0100] [950] [INFO] Worker exiting (pid: 950)
+[2024-01-22 13:39:13 +0100] [797] [ERROR] Worker (pid:950) exited with code 1
+[2024-01-22 13:39:13 +0100] [797] [ERROR] Worker (pid:950) exited with code 1.
+[2024-01-22 13:39:13 +0100] [797] [CRITICAL] WORKER TIMEOUT (pid:930)
+[2024-01-22 13:39:13 +0100] [797] [CRITICAL] WORKER TIMEOUT (pid:948)
+[2024-01-22 13:39:13 +0100] [930] [INFO] Worker exiting (pid: 930)
+[2024-01-22 13:39:13 +0100] [948] [INFO] Worker exiting (pid: 948)
+[2024-01-22 13:39:13 +0100] [1987] [INFO] Booting worker with pid: 1987
+[2024-01-22 13:39:14 +0100] [797] [ERROR] Worker (pid:930) exited with code 1
+[2024-01-22 13:39:14 +0100] [797] [ERROR] Worker (pid:930) exited with code 1.
+[2024-01-22 13:39:14 +0100] [797] [CRITICAL] WORKER TIMEOUT (pid:935)
+[2024-01-22 13:39:14 +0100] [935] [INFO] Worker exiting (pid: 935)
+[2024-01-22 13:39:14 +0100] [1988] [INFO] Booting worker with pid: 1988
+[2024-01-22 13:39:14 +0100] [797] [ERROR] Worker (pid:948) exited with code 1
+[2024-01-22 13:39:14 +0100] [797] [ERROR] Worker (pid:948) exited with code 1.
+[2024-01-22 13:39:14 +0100] [1989] [INFO] Booting worker with pid: 1989
+[2024-01-22 13:39:14 +0100] [797] [ERROR] Worker (pid:935) was sent SIGKILL! Perhaps out of memory?
+[2024-01-22 13:39:14 +0100] [1990] [INFO] Booting worker with pid: 1990
