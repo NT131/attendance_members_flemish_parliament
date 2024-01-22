@@ -26,11 +26,14 @@ import attendance_statistics # import functions of attendance_statistics.py (i.e
 locale.setlocale(locale.LC_TIME, 'nl_BE.utf8')  # Set appropriate locale for Dutch
 
 
-# Read in all meetings and attendance (both full (i.e. dict with party and id) and short (i.e. only name)
-relevant_extraction_date = "2023-12-18"
+# # Read in all meetings and attendance (both full (i.e. dict with party and id) and short (i.e. only name)
+# relevant_extraction_date = "2023-12-18"
 
-meetings_all_commissions_df = pd.read_pickle(f'../data/meetings_all_commissions_df_{relevant_extraction_date}.pkl')
-meetings_all_commissions_short_df = pd.read_pickle(f'../data/meetings_all_commissions_short_df_{relevant_extraction_date}.pkl')
+#meetings_all_commissions_df = pd.read_pickle(f'../data/meetings_all_commissions_df_{relevant_extraction_date}.pkl')
+#meetings_all_commissions_short_df = pd.read_pickle(f'../data/meetings_all_commissions_short_df_{relevant_extraction_date}.pkl')
+meetings_all_commissions_df = pd.read_pickle(f'../data/meetings_all_commissions_df.pkl')
+meetings_all_commissions_short_df = pd.read_pickle(f'../data/meetings_all_commissions_short_df.pkl')
+
 
 # Obtain date of most recent meeting in dataset + format to e.g. "15 februari 2023"
 date_most_recent_meeting_per_com = meetings_all_commissions_df['Datum vergadering'].max().strftime('%d %B %Y')
@@ -39,7 +42,8 @@ date_most_recent_meeting_per_com = meetings_all_commissions_df['Datum vergaderin
 diff_commissions = list(set(meetings_all_commissions_df["commissie.titel"]))
 
 # Read in commission_overview_df with overall info on each commission
-commissions_overview_df = pd.read_pickle(f'../data/commissions_overview_df_{relevant_extraction_date}.pkl')
+# commissions_overview_df = pd.read_pickle(f'../data/commissions_overview_df_{relevant_extraction_date}.pkl')
+commissions_overview_df = pd.read_pickle(f'../data/commissions_overview_df.pkl')
 
 # Load information about parties
 with open(f'../data/fracties.pkl', 'rb') as file:
