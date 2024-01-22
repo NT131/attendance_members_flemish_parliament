@@ -37,7 +37,7 @@ date_most_recent_meeting_per_party = meetings_all_commissions_df['Datum vergader
 diff_commissions = list(set(meetings_all_commissions_df["commissie.titel"]))
 
 # Read in commission_overview_df with overall info on each commission
-commissions_overview_df = pd.read_pickle(f'../data/commissions_overview_df_{relevant_extraction_date}.pkl')
+# commissions_overview_df = pd.read_pickle(f'../data/commissions_overview_df_{relevant_extraction_date}.pkl')
 commissions_overview_df = pd.read_pickle(f'../data/commissions_overview_df.pkl')
 
 
