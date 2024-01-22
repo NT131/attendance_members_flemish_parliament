@@ -7,13 +7,6 @@
 
 # # Setting up
 
-# In[1]:
-
-
-# show all outputs of cell, not merely of last line (i.e. default of Jupyter Notebook)
-from IPython.core.interactiveshell import InteractiveShell
-InteractiveShell.ast_node_interactivity = "all"
-
 
 # In[2]:
 
@@ -40,19 +33,7 @@ import copy
 import os
 
 
-# In[3]:
 
-
-# # Set the locale to Dutch
-# locale.setlocale(locale.LC_ALL, 'nl_NL')
-
-
-# In[4]:
-
-
-# # Obtain string of current date
-# today_str = datetime.now().strftime("%Y-%m-%d")
-# today_str 
 
 
 # In[5]:
@@ -62,18 +43,6 @@ import os
 base_url = "https://ws.vlpar.be/e/opendata"
 
 
-# In[6]:
-
-
-# The webpage of the API shows some interesting fields:
-# * `/stats/{commId}/{zj}`: statistieken voor commissie per zittingsjaar
-# * `/vv/huidige`: Lijst van huidige Vlaamse volksvertegenwoordigers
-# * `/vv/gewezen`: Lijst van gewezen Vlaamse volksvertegenwoordigers
-# * `/vv/{persoonId}` Detailgegevens volksvertegenwoordiger
-# * `/comm/huidige` Commissies van de huidige legislatuur
-# * `/comm/{commId}` Samenstelling commissie
-# * `/verg/vorige` Lijst van vorige vergaderingen voor periode
-# * `/verg/zoek/datums` Lijst van vorige vergaderingen (beperkte data) binnen een zekere periode
 
 
 # # Read in data
@@ -118,10 +87,6 @@ volksvertegenwoordigers_df = pd.DataFrame.from_dict(
 # In[9]:
 
 
-# # Inspect results
-# volksvertegenwoordigers_df.head()
-# volksvertegenwoordigers_df.columns
-
 
 # This dataframe contains the relevant party names and their corresponding colour. We can use this later when visualising, so we obtain this and store it.
 
@@ -137,11 +102,6 @@ for kleur, partij in zip(volksvertegenwoordigers_df["volksvertegenwoordiger.frac
         partij_kleur_dict[partij] = kleur
 
 
-# In[11]:
-
-
-# # Inspect results
-# partij_kleur_dict
 
 
 # In[12]:
@@ -174,12 +134,6 @@ for index, row in volksvertegenwoordigers_df.iterrows():
     parlementsleden_all_dict[parlementslid_id] = [voornaam_en_naam, fractie]
 
 
-# In[14]:
-
-
-# # Inspect results
-# fracties_dict
-# parlementsleden_all_dict
 
 
 # In[15]:
@@ -221,13 +175,6 @@ commissies_json = get_endpoint("/comm/huidige")
 commissies_pd = pd.DataFrame.from_dict(pd.json_normalize(commissies_json['items']), orient='columns')
 
 
-# In[17]:
-
-
-# # Inspect results
-# commissies_pd.head()
-# commissies_pd.columns
-# # commissies_pd["commissie.titel"]
 
 
 # In[18]:
@@ -235,9 +182,7 @@ commissies_pd = pd.DataFrame.from_dict(pd.json_normalize(commissies_json['items'
 
 #Only keep relevant columns
 commissions_overview_df = commissies_pd[["commissie.id", "commissie.titel", "commissie.link"]]
-
-# # Inspect results
-# commissions_overview_df                                
+                             
 
 
 # Then we obtain more details for each commission, using information obtained when parsing the current commissions. We store this in a dict: `commissies_samenstelling_dict`.
@@ -254,9 +199,6 @@ for commId in commissies_pd["commissie.id"]:
 
 # In[20]:
 
-
-# # Inspect results
-# commissies_samenstelling_dict
 
 
 # Inspection of the results shows that for each commission (identified by its id), some information is provide, such as: `afkorting`, `naam`, `commissiesecretaris`, as well as `functie`. This last tag contains the various possible functions for members in the commission (such as 'voorzitter', 'vast lid', 'plaatsvervangend lid'), and the information of those members.  Hence, we can use this tag to extract the members of all commissions and store it in a dict `commission_members_dict`. We also assess which different functions occur over all commissions (see below). Based on these functions, we modify the cell below to store all relevant functions (e.g. if only 'ondervoorzitter' and 'secretary': for consistency store as 'eerste ondervoorzitter' en 'tweede ondervoorzitter').  
@@ -361,12 +303,7 @@ set(diff_functions_list)
 #     if commission_members_dict[key][]
 
 
-# In[23]:
 
-
-# # # Inspect results
-# # commissions_overview_df.iloc[1]['vaste leden']
-# commissions_overview_df
 
 
 # For some commissions, there does not seem to be much relevant information. For instance for the `Onderzoekscommissie naar de veiligheid in de kinderopvang`, `Werkgroep Institutionele Zaken` en de `Commissie ad hoc`, no permanent members or presidents are registered. Hence, those cannot be taken into account in a meaninful way to assess presence of members. Hence we can drop them out of the data frame and reset the indices. For `Controlecommissie voor Regeringsmededelingen`, no president is registered, but there are however permanent members.
@@ -409,29 +346,6 @@ start = date_last_meeting - timedelta(days=1)
 print(f'Starting point of monitoring: {start}.')
 
 
-# In[ ]:
-
-
-
-
-
-# In[27]:
-
-
-meetings_all_commissions_df_current.head()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
 
 # In[28]:
 
@@ -439,20 +353,7 @@ meetings_all_commissions_df_current.head()
 # First, we obtain the relevant time frame for which we want to obtain attendance information. If we want to assess attendance at all meetings of the current legislature, we can use the `get_endpoint()` function to obtain this.
 
 
-# In[29]:
 
-
-# # use endpoint to obtain information about legislaturen
-# legislaturen = get_endpoint('/leg/alle')
-
-# # Extracting the most recent legislatuur start date
-# legislatuur_items = legislaturen['items']
-# most_recent_legislatuur = max(legislatuur_items, key=lambda x: x['legislatuur']['start-legislatuur'])
-# start_date_most_recent_legislatuur_str = most_recent_legislatuur['legislatuur']['start-legislatuur']
-# start_date_most_recent_legislatuur_str
-
-# start = datetime.strptime(start_date_most_recent_legislatuur_str, '%Y-%m-%dT%H:%M:%S%z').date()
-# print(f'Starting point of monitoring: {start}.')
 
 
 # In[30]:
@@ -462,23 +363,6 @@ meetings_all_commissions_df_current.head()
 end = datetime.now().date()
 print(f'End point of monitoring: {end}.')
 
-
-# In[31]:
-
-
-# # Create string version (to append to filenames of output files)
-# end_str = end.strftime("%Y-%m-%d")
-# end_str
-
-
-# In[32]:
-
-
-# # ========================= DEVELOPMENT ==============================================
-# # set temporary start time
-# start = datetime(2023, 9, 1).date()
-# print(f'Starting point of monitoring: {start}.')
-# # ========================= DEVELOPMENT ==============================================
 
 
 # Then we obtain all previous meetings for a specific commission, for a certain time frame. First, we create a helper function to extract the meeting id's of all relevant meetings (`extract_previous_meeting_ids_zoek()`). Then we use another helper function to use those meeting id's to extract the attendance information on all those meetings (`extract_meeting_details()`). 
@@ -646,14 +530,6 @@ print("--> Processing complete")
 print("-" * 75)
 
 
-# In[36]:
-
-
-# # Inspect results
-# overall_attendance_dict.keys()
-# overall_attendance_dict['Commissie voor Cultuur, Jeugd, Sport en Media']
-
-# commissions_overview_df[["commissie.titel", "aantal vergaderingen"]]
 
 
 # In[37]:
@@ -750,12 +626,7 @@ for index_spec, row_specific in meetings_all_commissions_df.iterrows():
             meetings_all_commissions_df.loc[index_spec, column_name_to_calculate_from])
 
 
-# In[43]:
 
-
-# # Inspect results
-# commissions_overview_df
-# meetings_all_commissions_df
 
 
 # In[46]:
@@ -774,31 +645,9 @@ for col in columns_to_modify:
         lambda x: [item["Naam"] for item in x] if isinstance(x, list) else None)
 
 
-# In[45]:
+ 
 
 
-# # Inspect results
-# meetings_all_commissions_short_df
-
-
-# Then we save the dataframes. 
-
-# In[ ]:
-
-
-# ## Save dict with all dataframes for later use
-# # 1. Save as pkl. 
-# with open(f'../data/vergaderingen_commissies/overall_attendance_dict_{today_str}.pkl', 'wb') as file:
-#     pickle.dump(overall_attendance_dict, file)
-
-# # 2. Save as xlsx (for easier visual inspection)
-# # Create a Pandas Excel writer using xlsxwriter as the engine
-# with pd.ExcelWriter(f'../data/vergaderingen_commissies/overall_attendance_dict_{today_str}.xlsx', engine='xlsxwriter') as writer:
-#     # Loop through each key-value pair in the dictionary
-#     for key, df in overall_attendance_dict.items():
-#         # Write each DataFrame to a specific sheet in the Excel file
-#         # Limit Excel worksheet name to 30 chars, else error
-#         df.to_excel(writer, sheet_name=key[:31], index=False)
 
 
 # In[48]:
@@ -816,19 +665,7 @@ meetings_all_commissions_df.to_csv(path_or_buf = f'../data/meetings_all_commissi
                                index = False)
 
 
-# In[49]:
 
-
-# ## Save meetings_all_commissions_df for later use
-# # 1. Save as pkl
-# with open(f'../data/meetings_all_commissions_df_{today_str}.pkl', 'wb') as file:
-#     pickle.dump(meetings_all_commissions_df, file)
-
-# # 2. Save as csv
-# meetings_all_commissions_df.to_csv(path_or_buf = f'../data/meetings_all_commissions_df_{today_str}.csv',
-#                                sep = ";",
-#                                encoding = "utf-16", # to ensure trema's are well handled (e.g. Koen Daniëls)
-#                                index = False)
 
 
 # In[50]:
@@ -846,21 +683,6 @@ meetings_all_commissions_short_df.to_csv(path_or_buf = f'../data/meetings_all_co
                                          index = False)
 
 
-# In[51]:
-
-
-# ## Save meetings_all_commissions_short_df for later use
-# # 1. Save as pkl
-# with open(f'../data/meetings_all_commissions_short_df_{today_str}.pkl', 'wb') as file:
-#     pickle.dump(meetings_all_commissions_short_df, file)
-
-# # 2. Save as csv
-# meetings_all_commissions_short_df.to_csv(path_or_buf = f'../data/meetings_all_commissions_short_df_{today_str}.csv',
-#                                          sep = ";",
-#                                          encoding = "utf-16", # to ensure trema's are well handled (e.g. Koen Daniëls)
-#                                          index = False)
-
-
 # In[52]:
 
 
@@ -876,140 +698,5 @@ commissions_overview_df.to_csv(path_or_buf = f'../data/commissions_overview_df.c
                                index = False)
 
 
-# In[ ]:
 
-
-# ## Save commissions_overview_df for later use
-# # 1. Save as pkl
-# with open(f'../data/commissions_overview_df_{today_str}.pkl', 'wb') as file:
-#     pickle.dump(commissions_overview_df, file)
-
-# # 2. Save as csv
-# commissions_overview_df.to_csv(path_or_buf = f'../data/commissions_overview_df_{today_str}.csv',
-#                                sep = ";",
-#                                encoding = "utf-16", # to ensure trema's are well handled (e.g. Koen Daniëls)
-#                                index = False)
-
-
-# # Test chunks
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-# meetings_all_commissions_df.loc["Vergadering 1764019", "AANWEZIG_vast"][0]
-# type(meetings_all_commissions_df.loc["Vergadering 1764019", "AANWEZIG_vast"][0])
-
-
-# In[ ]:
-
-
-# meetings_all_commissions_df["AANWEZIG_vast"].apply(
-#     lambda x: [item["Naam"] for item in x] if isinstance(item, list) else None
-# )
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-# # Convert the index to a column (to be able to take it into account for the duplicate analysis) and identify non-duplicated items
-# meetings_all_commissions_df_all['Index'] = meetings_all_commissions_df_all.index
-# meetings_all_commissions_df_all_str = meetings_all_commissions_df_all.astype(str)
-# meetings_all_commissions_df = meetings_all_commissions_df_all_str[~meetings_all_commissions_df_all_str.duplicated(keep='first')]
-
-# # Remove the extra column used for comparison
-# meetings_all_commissions_df = meetings_all_commissions_df.drop(columns=['Index'])
-
-# # Inspect results
-# print("Amount of total meetings after update (excl. duplicates:", 
-#       meetings_all_commissions_df.shape[0])
-
-
-# In[ ]:
-
-
-# # Convert the index to a column (to be able to take it into account for the duplicate analysis) and identify non-duplicated items
-# meetings_all_commissions_df_all['Index'] = meetings_all_commissions_df_all.index
-# meetings_all_commissions_df_all_str = meetings_all_commissions_df_all.astype(str)
-# meetings_all_commissions_df = meetings_all_commissions_df_all_str[~meetings_all_commissions_df_all_str.duplicated(keep='first')]
-
-# # Remove the extra column used for comparison
-# meetings_all_commissions_df = meetings_all_commissions_df.drop(columns=['Index'])
-
-# # Inspect results
-# print("Amount of total meetings after update (excl. duplicates:", 
-#       meetings_all_commissions_df.shape[0])
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-# meetings_all_commissions_df_all.index
-
-
-# In[ ]:
-
-
-# unique = set(meetings_all_commissions_df_all.index)
-# len(unique)
-
-
-# In[ ]:
-
-
-# # Identify duplicates based on all columns (including the list column)
-# duplicates_mask = meetings_all_commissions_df_all.apply(lambda row: tuple(row) if isinstance(row, list) else row, axis=1).duplicated(keep=False)
-
-
-# # Display all items that are not unique
-# non_unique_items = meetings_all_commissions_df_all[duplicates_mask]
-# print(non_unique_items)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-# # Convert lists to strings and identify duplicate rows based on all columns
-# # Convert the index to a column and include it in the identification of duplicate rows
-# meetings_all_commissions_df_all['Index'] = meetings_all_commissions_df_all.index
-# df_str = meetings_all_commissions_df_all.astype(str)
-# duplicate_rows = df_str[df_str.duplicated(keep=False)]
-
-# # Display the duplicate rows
-# duplicate_rows
 
