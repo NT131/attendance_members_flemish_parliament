@@ -26,7 +26,7 @@ import locale # to allow date parsing for dates in Dutch
 
 from collections import Counter
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 import copy
 
