@@ -1,3 +1,5 @@
 __pycache__/
 attendance_flemish_parliament_env/
 code/.ipynb_checkpoints/
+data/
+dash/attendance_flemish_parliament.log
