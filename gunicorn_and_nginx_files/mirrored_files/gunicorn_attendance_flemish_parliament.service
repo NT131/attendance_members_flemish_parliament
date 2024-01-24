@@ -1,0 +1,18 @@
+# File to ensure Gunicorn server for this application starts automatically on boot up
+[Unit]
+Description=Gunicorn instance to serve 'attendance_flemish_parliament' Dash application
+After=network.target
+
+[Service]
+# define user an group (do not include comments in lines, else 217 error)
+User=nielstack 
+Group=nielstack
+#[path/to/app]
+WorkingDirectory=/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash
+#[/path/to/your/virtualenv/bin/gunicorn] -w 3 -b [IP-address with port] + [file_name]:[server_name] --log-file=/path/to/logfile.log
+ExecStart=/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament_env/bin/gunicorn -w 7 -b 0.0.0.0:5002 attendance_integrated:application --log-file=/home/nielstack/projects/erpohk/visualisations/attendance_flemish_parliament/dash/attendance_flemish_parliament.log
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
