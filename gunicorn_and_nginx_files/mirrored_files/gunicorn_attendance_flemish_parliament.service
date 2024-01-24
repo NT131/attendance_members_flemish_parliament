@@ -1,3 +1,5 @@
+# location: /etc/systemd/system/gunicorn_attendance_flemish_parliament.service
+
 # File to ensure Gunicorn server for this application starts automatically on boot up
 [Unit]
 Description=Gunicorn instance to serve 'attendance_flemish_parliament' Dash application
