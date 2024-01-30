@@ -6,34 +6,34 @@
 # In[1]:
 
 
-# import numpy as np
+import numpy as np
 import pandas as pd
 
 import re
 
-# import csv
+import csv
 import pickle
 
-# from collections import defaultdict
+from collections import defaultdict
 
 import requests
 
-# from datetime import datetime
-# import locale # to allow date parsing for dates in Dutch
+from datetime import datetime
+import locale # to allow date parsing for dates in Dutch
 
-# from collections import Counter
+from collections import Counter
 
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-# import copy
+import copy
 
 
 # In[2]:
 
 
-# # show all outputs of cell, not merely of last line (i.e. default of Jupyter Notebook)
-# from IPython.core.interactiveshell import InteractiveShell
-# InteractiveShell.ast_node_interactivity = "all"
+# show all outputs of cell, not merely of last line (i.e. default of Jupyter Notebook)
+from IPython.core.interactiveshell import InteractiveShell
+InteractiveShell.ast_node_interactivity = "all"
 
 
 # In[3]:
@@ -172,6 +172,7 @@ details_questions_term_df.tail()
 # * Map the relevant party to each member
 # * Cast the dates to the right format
 # * Include a column on the time it took to answer a question
+# * Merge the values of the columns 'onderwerp' and 'url' into a markdown representation that can be used later on in dash application. 
 
 # In[8]:
 
@@ -235,7 +236,38 @@ details_questions_term_df['datum gesteld'] = details_questions_term_df['datum ge
 details_questions_term_df['datum beantwoord'] = details_questions_term_df['datum beantwoord'].dt.date
 
 
-# In[18]:
+# In[21]:
+
+
+# Function to create markdown-style links
+def create_markdown_link(row):
+    return f"[{row['onderwerp']}]({row['url']})"
+
+# Apply the function to create a new column 'onderwerp_markdown'
+details_questions_term_df["onderwerp"]= details_questions_term_df.apply(create_markdown_link, axis=1)
+
+details_questions_term_df = details_questions_term_df.drop(['url'], axis=1)
+
+
+# In[22]:
+
+
+details_questions_term_df.head()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[23]:
 
 
 ## Save details_questions_term_df for later use
