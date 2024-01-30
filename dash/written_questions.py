@@ -214,6 +214,10 @@ layout = html.Div(
                             placeholder="Selecteer parlementslid",
                             style={'width': '50%'}
                         ),
+                        html.Div(
+                            id='datatable-info', 
+                            style={'margin-top': '10px', 'font-size': '14px'}
+                        ),
                         dash_table.DataTable(
                             id='written-questions-table',
                             columns=[
@@ -339,15 +343,6 @@ def update_chart(selected_axis, written_questions_df_input):
 
     return fig
 
-# def update_table(start_date, end_date, theme_filter, minister_filter, 
-#                  selected_axis):
-#     # Filter data based on user input
-#     written_questions_filtered_df = filter_data(start_date, end_date,
-#                                                 theme_filter, minister_filter,
-#                                                 written_questions_df)
-
-#     # Return data for DataTable
-#     return written_questions_filtered_df.to_dict('records')
 
 
 #Create function to load app in integrated appraoch
@@ -355,7 +350,8 @@ def register_callbacks(app):
     @app.callback(
         [Output('amount_questions', 'children'),
          Output('written_questions_graph', 'figure'),
-         Output('written-questions-table', 'data')],
+         Output('written-questions-table', 'data'),
+         Output('datatable-info', 'children')],
         [Input('date-range-written-questions', 'start_date'),
          Input('date-range-written-questions', 'end_date'),
          Input("theme-filter", "value"),
@@ -379,7 +375,7 @@ def register_callbacks(app):
         # Check if the selected axis is 'vraagsteller' to update DataTable
         if selected_axis == 'vraagsteller' and selected_member:
             # Filter data for the selected member
-            selected_member_data = written_questions_df[written_questions_df['vraagsteller'] == selected_member][['datum gesteld', 'minister', 'onderwerp']]
+            selected_member_data = written_questions_filtered_df[written_questions_filtered_df['vraagsteller'] == selected_member][['datum gesteld', 'minister', 'onderwerp']]
 
         else:
             # If the selected axis is not 'vraagsteller', provide an empty DataFrame
@@ -387,7 +383,8 @@ def register_callbacks(app):
          
         return [f"Deze selectie resulteert in {amount_questions} relevante schriftelijke vragen.", # Use text formatting to allow easier build of layout
                 written_questions_graph,
-                selected_member_data.to_dict('records')]
+                selected_member_data.to_dict('records'),
+                f"Dit parlementslid stelde {len(selected_member_data)} vragen."]
 
 
 # =============================================================================
