@@ -102,6 +102,7 @@ layout = html.Div(
                     				# 	children=f"Laatste update: {date_most_recent_meeting_per_party}",
                     				# 	style={'font-style': 'italic'}
                     				# ),
+                                
                                 dcc.DatePickerRange(
                                     id="date-range-written-questions",
                                     min_date_allowed=written_questions_df["datum beantwoord"].min(),
@@ -113,6 +114,51 @@ layout = html.Div(
                             ],
                             className="menu-element"
                         ),
+                        
+                        # Theme filter dropdown
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    children="Selecteer thema", 
+                                    className="menu-title"
+                                ),
+                                dcc.Dropdown(
+                                    id="theme-filter",
+                                    options=[
+                                        {'label': 'Alle', 'value': 'Alle'}
+                                        ] + [
+                                        {'label': theme, 'value': theme} for theme in written_questions_df['thema'].unique()
+                                        ],
+                                    multi=True,
+                                    value='Alle',
+                                    placeholder="Selecteer thema's",
+                                ),
+                            ],
+                            className="menu-element"
+                        ),
+                        
+                        # Minister dropdown
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    children="Selecteer minister ", 
+                                    className="menu-title"
+                                ),
+                                dcc.Dropdown(
+                                    id="minister-filter",
+                                    options=[
+                                        {'label': 'Alle', 'value': 'Alle'},
+                                        ] + [
+                                        {'label': minister, 'value': minister} for minister in written_questions_df['minister'].unique()
+                                    ],
+                                    multi=False,
+                                    value='Alle',
+                                    placeholder="Selecteer minister",
+                                ),
+                            ],
+                            className="menu-element"
+                        ),
+                        
                     		# Display impact of data selection (i.e. how many written questions are taken into account)	
                     		html.Div(
                     			children=[
@@ -151,18 +197,31 @@ layout = html.Div(
 # Callback
 # =============================================================================
 #Define function to filter data based on user selection
-def filter_data(start_date, end_date, written_questions_df):   
+def filter_data(start_date, end_date, theme_filter, 
+                minister_filter, written_questions_df):   
     # Ensure correct date format
     start_date = pd.to_datetime(start_date).date()
     end_date = pd.to_datetime(end_date).date()
     
     
-    # Filter DataFrame with all commission meetings further based on the date range
+    # Filter DataFrame with all questions further based on the date range
     written_questions_filtered_df = written_questions_df[
          (written_questions_df['datum beantwoord'] >= start_date) &
          (written_questions_df['datum beantwoord'] <= end_date)
      ]
     
+    # Filter DataFrame based on the selected theme
+    if theme_filter is not None and theme_filter != 'Alle':
+        written_questions_filtered_df = written_questions_filtered_df[
+            written_questions_filtered_df['thema'].isin(theme_filter)
+        ]
+    
+    # Exclude entries with the same minister value
+    if minister_filter is not None and minister_filter != 'Alle':
+        written_questions_filtered_df = written_questions_filtered_df[
+            written_questions_filtered_df['minister'] == minister_filter
+        ]
+        
     return written_questions_filtered_df
 
 
@@ -233,11 +292,15 @@ def register_callbacks(app):
          Output('written_questions_graph', 'figure')],
         [Input('date-range-written-questions', 'start_date'),
          Input('date-range-written-questions', 'end_date'),
+         Input("theme-filter", "value"),
+         Input("minister-filter", "value"),
          Input('x-axis-dropdown', 'value')]
         )
-    def update_display(start_date, end_date, selected_axis):
+    def update_display(start_date, end_date, theme_filter, minister_filter, 
+                       selected_axis):
         # Filter data based on user input
-        written_questions_filtered_df = filter_data(start_date, end_date, 
+        written_questions_filtered_df = filter_data(start_date, end_date,
+                                                    theme_filter, minister_filter,
                                                     written_questions_df)
     	# Obtain count of relevant data, after filtering
         amount_questions = len(written_questions_filtered_df)
@@ -246,7 +309,7 @@ def register_callbacks(app):
         written_questions_graph = update_chart(selected_axis, 
                                                written_questions_filtered_df)
     
-        return [f"Deze selectie resulteert in {amount_questions} relevante vergaderingen.", # Use text formatting to allow easier build of layout
+        return [f"Deze selectie resulteert in {amount_questions} relevante schriftelijke vragen.", # Use text formatting to allow easier build of layout
     				written_questions_graph]
 
 
