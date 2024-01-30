@@ -77,8 +77,9 @@ layout = html.Div(
             children=[
                 html.H2("Schriftelijke vragen",
                         className="header-subsubtitle"),
-                html.P("Welke parlementsleden stelden het meeste parlementaire vragen? En welke ministers kregen de meeste vragen te verwerken?",
-                       className="header-description"),
+                html.P("Welke parlementsleden stelden het meeste schriftelijke vragen?", className="header-description"),
+                # html.Br(),  # Insert a newline
+                html.P("En welke ministers kregen de meeste schriftelijke vragen te verwerken?", className="header-description"),
             ],
             className="section-header",
         ),
