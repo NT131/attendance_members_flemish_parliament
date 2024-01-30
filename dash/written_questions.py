@@ -104,10 +104,10 @@ layout = html.Div(
                     				# ),
                                 dcc.DatePickerRange(
                                     id="date-range-written-questions",
-                                    min_date_allowed=written_questions_df["datum"].min(),
-                                    max_date_allowed=written_questions_df["datum"].max(),
-                                    start_date=written_questions_df["datum"].min(),
-                                    end_date=written_questions_df["datum"].max(),
+                                    min_date_allowed=written_questions_df["datum beantwoord"].min(),
+                                    max_date_allowed=written_questions_df["datum beantwoord"].max(),
+                                    start_date=written_questions_df["datum beantwoord"].min(),
+                                    end_date=written_questions_df["datum beantwoord"].max(),
                                     display_format='DD/MM/YYYY',  # Set the display format to 'dd/mm/yyyy' instead of default 'mm/dd/yyyy'
                                 ),
                             ],
@@ -134,6 +134,7 @@ layout = html.Div(
                 {'label': 'Vraagsteller', 'value': 'vraagsteller'},
                 {'label': 'Partij', 'value': 'partij'},
                 {'label': 'Minister', 'value': 'minister'},
+                {'label': 'Thema', 'value': 'thema'},
             ],
             value='vraagsteller', # Default value
             style={'width': '50%'}
@@ -158,8 +159,8 @@ def filter_data(start_date, end_date, written_questions_df):
     
     # Filter DataFrame with all commission meetings further based on the date range
     written_questions_filtered_df = written_questions_df[
-         (written_questions_df['datum'] >= start_date) &
-         (written_questions_df['datum'] <= end_date)
+         (written_questions_df['datum beantwoord'] >= start_date) &
+         (written_questions_df['datum beantwoord'] <= end_date)
      ]
     
     return written_questions_filtered_df
@@ -209,6 +210,16 @@ def update_chart(selected_axis, written_questions_df_input):
                      color_discrete_map=party_colors,
                      labels={'x': 'Partij', 'y': 'Aantal vragen'},
                      title='Vragen gesteld per partij')
+        
+    elif selected_axis == 'thema':
+        grouped_data = written_questions_df_input['thema'].value_counts().reset_index()
+        grouped_data.columns = ['Thema', 'Aantal vragen']
+        fig = px.bar(grouped_data,
+                     x='Thema',
+                     y='Aantal vragen',
+                     # color='Thema',  # You can use 'color_discrete_map' if needed
+                     labels={'x': 'Thema', 'y': 'Aantal vragen'},
+                     title='Vragen per thema')
 
     else:
         fig = px.bar()
