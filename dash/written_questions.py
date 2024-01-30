@@ -11,6 +11,8 @@ import plotly.express as px
 
 import pickle
 
+from attendance_statistics import get_party
+
 # =============================================================================
 # Reading in relevant support data
 # =============================================================================
@@ -21,27 +23,7 @@ written_questions_df = pd.read_pickle('../data/details_questions_term_df.pkl')
 with open('../data/fracties.pkl', 'rb') as file:
     fracties_dict = pickle.load(file)
 
-# Function to search values of dict and return key of match
-def find_key(dictionary, search_value):
-    for key, values in dictionary.items():
-        for value in values:
-            if search_value in value:
-                return key
-    return None  # Return None if the value is not found in any list
 
-    
-# Function to get party color based on the provided dictionary
-def get_party(row):
-    # Obtain member's name
-    parliamentarian_name = row['Parlementslid']
-    # Obtain party of member
-    party_of_member = find_key(dictionary = fracties_dict,
-                               search_value = parliamentarian_name)
-    # if this yields no error: obtain relevant color
-    if party_of_member:
-        return party_of_member
-    else:
-        return None
 
 # Dictionary mapping parties to colors
 # # Use colours obtained from website: manual insertion or reading in dict
@@ -112,8 +94,9 @@ def update_chart(selected_axis):
         grouped_data = written_questions_df['vraagsteller'].value_counts().reset_index()
         grouped_data.columns = ['Parlementslid', 'Aantal vragen']
 
-        # Apply function to create a new column 'Partij' based on 
-        grouped_data['Partij'] = grouped_data.apply(get_party, axis=1)
+        # Apply function to create a new column 'Partij' based on fracties_dict
+        grouped_data['Partij'] = grouped_data.apply(get_party, axis=1,
+                                                    facties_dict_input=fracties_dict)
 
         fig = px.bar(grouped_data,
                      x='Parlementslid',
