@@ -219,7 +219,8 @@ layout = html.Div(
                             columns=[
                                 {'name': 'Datum vraag gesteld', 'id': 'datum gesteld'},
                                 {'name': 'Bevoegde minister', 'id': 'minister'},
-                                {'name': 'Onderwerp', 'id': 'onderwerp', 'presentation': 'markdown'},
+                                # use markdown represention to leverage clickable links of df
+                                {'name': 'Onderwerp', 'id': 'onderwerp', 'presentation': 'markdown'}, 
                             ],
                             page_size=25, #  Set the number of rows per page
                             style_table={'overflowX': 'auto'},
@@ -378,7 +379,7 @@ def register_callbacks(app):
         # Check if the selected axis is 'vraagsteller' to update DataTable
         if selected_axis == 'vraagsteller' and selected_member:
             # Filter data for the selected member
-            selected_member_data = written_questions_df[written_questions_df['vraagsteller'] == selected_member][['datum gesteld', 'minister', 'onderwerp', 'url']]
+            selected_member_data = written_questions_df[written_questions_df['vraagsteller'] == selected_member][['datum gesteld', 'minister', 'onderwerp']]
 
         else:
             # If the selected axis is not 'vraagsteller', provide an empty DataFrame
