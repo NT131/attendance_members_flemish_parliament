@@ -3,7 +3,7 @@
 # =============================================================================
 
 import dash
-from dash import dcc, html
+from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 
 import pandas as pd
@@ -128,7 +128,8 @@ layout = html.Div(
                                     options=[
                                         {'label': 'Alle', 'value': 'Alle'}
                                         ] + [
-                                        {'label': theme, 'value': theme} for theme in written_questions_df['thema'].unique()
+                                        # check if theme exists to avoid empty theme option
+                                        {'label': theme, 'value': theme} for theme in written_questions_df['thema'].unique() if theme
                                         ],
                                     multi=True,
                                     value='Alle',
@@ -175,18 +176,70 @@ layout = html.Div(
             className="wrapper",
         ),
     
-        dcc.Dropdown(
-            id='x-axis-dropdown',
-            options=[
-                {'label': 'Vraagsteller', 'value': 'vraagsteller'},
-                {'label': 'Partij', 'value': 'partij'},
-                {'label': 'Minister', 'value': 'minister'},
-                {'label': 'Thema', 'value': 'thema'},
-            ],
-            value='vraagsteller', # Default value
-            style={'width': '50%'}
-        ),
-        dcc.Graph(id='written_questions_graph'),
+                                            
+        dcc.Tabs([
+            dcc.Tab(
+                label='Algemeen',
+                children=[
+                    html.Div([
+                        dcc.Dropdown(
+                            id='x-axis-dropdown',
+                            options=[
+                                {'label': 'Vraagsteller', 'value': 'vraagsteller'},
+                                {'label': 'Partij', 'value': 'partij'},
+                                {'label': 'Minister', 'value': 'minister'},
+                                {'label': 'Thema', 'value': 'thema'},
+                            ],
+                            value='vraagsteller', # Default value
+                            style={'width': '50%'}
+                        ),
+                        
+                        dcc.Graph(id='written_questions_graph'),
+                        
+                        ]),
+                    ]),
+            dcc.Tab(
+                label='Specifieke parlementsleden',
+                children=[
+                    # New Div for Dropdown and DataTable
+                    html.Div([
+                        dcc.Dropdown(
+                            id='member-dropdown',
+                            # Sort options alphabetically. Important to wrap dicts in list
+                            options=[
+                                {'label': member, 'value': member} for member in sorted(written_questions_df['vraagsteller'].unique())
+                            ],
+                            multi=False,
+                            value=None, # Set default value as None to avoid table being rendered automatically 
+                            placeholder="Selecteer parlementslid",
+                            style={'width': '50%'}
+                        ),
+                        dash_table.DataTable(
+                            id='written-questions-table',
+                            columns=[
+                                {'name': 'Datum vraag gesteld', 'id': 'datum gesteld'},
+                                {'name': 'Bevoegde minister', 'id': 'minister'},
+                                {'name': 'Onderwerp', 'id': 'onderwerp', 'presentation': 'markdown'},
+                            ],
+                            page_size=25, #  Set the number of rows per page
+                            style_table={'overflowX': 'auto'},
+                            style_cell={
+                                'fontFamily': 'Lato, sans-serif',
+                                'fontSize': 14,
+                                'textAlign': 'left',
+                                'minWidth': '150px',
+                                'whiteSpace': 'normal',
+                                'textOverflow': 'ellipsis',
+                            },
+                            style_header={
+                                'fontWeight': 'bold',
+                                'fontSize': 16,
+                            },
+                        ),
+                    ], className='custom-datatable-container'),
+                ]
+            ),
+        ]),
     ],
     # use CSS flexbox approach to easily structure graphs and titles
     style={"display": "flex", "flex-direction": "column"} 
@@ -260,7 +313,6 @@ def update_chart(selected_axis, written_questions_df_input):
                      title='Vragen aan ministers')
 
     elif selected_axis == 'partij':
-
         grouped_data = written_questions_df_input['vraagsteller_partij'].value_counts().reset_index()
         grouped_data.columns = ['Partij', 'Aantal vragen']
         fig = px.bar(grouped_data,
@@ -286,19 +338,32 @@ def update_chart(selected_axis, written_questions_df_input):
 
     return fig
 
+# def update_table(start_date, end_date, theme_filter, minister_filter, 
+#                  selected_axis):
+#     # Filter data based on user input
+#     written_questions_filtered_df = filter_data(start_date, end_date,
+#                                                 theme_filter, minister_filter,
+#                                                 written_questions_df)
+
+#     # Return data for DataTable
+#     return written_questions_filtered_df.to_dict('records')
+
+
 #Create function to load app in integrated appraoch
 def register_callbacks(app):
     @app.callback(
         [Output('amount_questions', 'children'),
-         Output('written_questions_graph', 'figure')],
+         Output('written_questions_graph', 'figure'),
+         Output('written-questions-table', 'data')],
         [Input('date-range-written-questions', 'start_date'),
          Input('date-range-written-questions', 'end_date'),
          Input("theme-filter", "value"),
          Input("minister-filter", "value"),
-         Input('x-axis-dropdown', 'value')]
+         Input('x-axis-dropdown', 'value'),
+         Input('member-dropdown', 'value')]
         )
     def update_display(start_date, end_date, theme_filter, minister_filter, 
-                       selected_axis):
+                       selected_axis, selected_member):
         # Filter data based on user input
         written_questions_filtered_df = filter_data(start_date, end_date,
                                                     theme_filter, minister_filter,
@@ -309,10 +374,19 @@ def register_callbacks(app):
         # Create graph using user selected axis and filtered df
         written_questions_graph = update_chart(selected_axis, 
                                                written_questions_filtered_df)
-    
-        return [f"Deze selectie resulteert in {amount_questions} relevante schriftelijke vragen.", # Use text formatting to allow easier build of layout
-    				written_questions_graph]
+          
+        # Check if the selected axis is 'vraagsteller' to update DataTable
+        if selected_axis == 'vraagsteller' and selected_member:
+            # Filter data for the selected member
+            selected_member_data = written_questions_df[written_questions_df['vraagsteller'] == selected_member][['datum gesteld', 'minister', 'onderwerp', 'url']]
 
+        else:
+            # If the selected axis is not 'vraagsteller', provide an empty DataFrame
+            selected_member_data = pd.DataFrame()
+         
+        return [f"Deze selectie resulteert in {amount_questions} relevante schriftelijke vragen.", # Use text formatting to allow easier build of layout
+                written_questions_graph,
+                selected_member_data.to_dict('records')]
 
 
 # =============================================================================
