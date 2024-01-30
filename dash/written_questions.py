@@ -40,21 +40,50 @@ party_colors = {'Groen': '#83de62',
  }
 
 # Map ministers to their party colors
+# minister_colors = {
+#     'Benjamin Dalle': '#f5822a',
+#     'Hilde Crevits': '#f5822a',
+#     'Jo Broens': '#f5822a',
+#     'Wouter Beke': '#f5822a',
+    
+#     'Ben Weyts': '#ffac12',
+#     'Jan Jambon': '#ffac12',
+#     'Matthias Diependaele': '#ffac12',
+#     'Zuhal Demir': '#ffac12',
+    
+#     'Bart Somers': '#003d6d',
+#     'Gwendolyne Rutten': '#003d6d',
+#     'Lydia Peeters': '#003d6d',
+#  }
+# minister_colors = {
+#     'cd&v': ['#f5822a', '#f5822a', '#f5822a', '#f5822a'],
+#     'N-VA': ['#ffac12', '#ffac12', '#ffac12', '#ffac12'],
+#     'Open Vld': ['#003d6d', '#003d6d', '#003d6d'],
+# }
 minister_colors = {
-    'Benjamin Dalle': '#f5822a',
-    'Hilde Crevits': '#f5822a',
-    'Jo Broens': '#f5822a',
-    'Wouter Beke': '#f5822a',
+    'cd&v': '#f5822a',
+    'N-VA': '#ffac12',
+    'Open Vld': '#003d6d',
+}
+
+
+# Assign groups to ministers
+minister_groups = {
+    'Benjamin Dalle': 'cd&v',
+    'Hilde Crevits': 'cd&v',
+    'Jo Broens': 'cd&v',
+    'Wouter Beke': 'cd&v',
     
-    'Ben Weyts': '#ffac12',
-    'Jan Jambon': '#ffac12',
-    'Matthias Diependaele': '#ffac12',
-    'Zuhal Demir': '#ffac12',
+    'Ben Weyts': 'N-VA',
+    'Jan Jambon': 'N-VA',
+    'Matthias Diependaele': 'N-VA',
+    'Zuhal Demir': 'N-VA',
     
-    'Bart Somers': '#003d6d',
-    'Gwendolyne Rutten': '#003d6d',
-    'Lydia Peeters': '#003d6d',
- }
+    'Bart Somers': 'Open Vld',
+    'Gwendolyne Rutten': 'Open Vld',
+    'Lydia Peeters': 'Open Vld',
+}
+
 
 # =============================================================================
 # # Initiate dash app
@@ -77,8 +106,8 @@ layout = html.Div(
             children=[
                 html.H2("Schriftelijke vragen",
                         className="header-subsubtitle"),
+                # html.P("Welke parlementsleden stelden het meeste schriftelijke vragen? En welke ministers kregen de meeste schriftelijke vragen te verwerken?", className="header-description"),
                 html.P("Welke parlementsleden stelden het meeste schriftelijke vragen?", className="header-description"),
-                # html.Br(),  # Insert a newline
                 html.P("En welke ministers kregen de meeste schriftelijke vragen te verwerken?", className="header-description"),
             ],
             className="section-header",
@@ -87,10 +116,10 @@ layout = html.Div(
             children=[
                 html.Div(
                     children=[
-                        html.H3(
-                            "Selecteer de relevante periode.",
-                            className="header-subsubtitle",
-                        ),
+                        # html.H3(
+                        #     "Selecteer de relevante periode.",
+                        #     className="header-subsubtitle",
+                        # ),
                         html.Div(
                             children=[
                                 html.Div(
@@ -170,7 +199,7 @@ layout = html.Div(
                     			className="menu-element"
                     		),
                     ], 
-                    className="section-chart",
+                    className="flex-container",
                 ),
             ],
             className="wrapper",
@@ -309,14 +338,17 @@ def update_chart(selected_axis, written_questions_df_input):
     elif selected_axis == 'minister':
         grouped_data = written_questions_df_input['minister'].value_counts().reset_index()
         grouped_data.columns = ['Minister', 'Aantal vragen']
+        grouped_data['Partij'] = grouped_data['Minister'].map(minister_groups)
         fig = px.bar(grouped_data,
                      x='Minister',
                      y='Aantal vragen',
-                     color='Minister',
+                     color='Partij',
                      color_discrete_map=minister_colors,
                      labels={'x': 'Minister', 'y': 'Aantal vragen'},
                      title='Vragen aan ministers')
-
+        # Update x-axis to reflect the sorted order
+        fig.update_xaxes(categoryorder='total descending')
+        
     elif selected_axis == 'partij':
         grouped_data = written_questions_df_input['vraagsteller_partij'].value_counts().reset_index()
         grouped_data.columns = ['Partij', 'Aantal vragen']

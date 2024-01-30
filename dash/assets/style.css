@@ -295,3 +295,12 @@ body {
     max-width: 1200px;
     margin: auto;
 }
+
+/* Show selector menus of tab Written questions next to each other*/
+.flex-container {
+    display: flex;
+}
+
+.menu-element {
+    margin-right: 20px;  /* Adjust the margin as needed */
+}
