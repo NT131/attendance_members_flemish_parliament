@@ -60,16 +60,18 @@ minister_colors = {
 # # Initiate dash app
 # =============================================================================
 
-# Dash app
-app = dash.Dash(__name__,
-                assets_folder='assets') # Relative path to the folder of css file))
+# Comment out in integrated approach
+# # Dash app
+# app = dash.Dash(__name__,
+#                 assets_folder='assets') # Relative path to the folder of css file))
 
 # =============================================================================
 # Dash layout
 # =============================================================================
 
 ## Comment in integrated approach
-app.layout = html.Div(
+# app.
+layout = html.Div(
     children=[
         html.Div(
             children=[
@@ -213,32 +215,34 @@ def update_chart(selected_axis, written_questions_df_input):
 
     return fig
 
-
-@app.callback(
-    [Output('amount_questions', 'children'),
-     Output('written_questions_graph', 'figure')],
-    [Input('date-range-written-questions', 'start_date'),
-     Input('date-range-written-questions', 'end_date'),
-     Input('x-axis-dropdown', 'value')]
-    )
-def update_display(start_date, end_date, selected_axis):
-    # Filter data based on user input
-    written_questions_filtered_df = filter_data(start_date, end_date, 
-                                                written_questions_df)
-	# Obtain count of relevant data, after filtering
-    amount_questions = len(written_questions_filtered_df)
+#Create function to load app in integrated appraoch
+def register_callbacks(app):
+    @app.callback(
+        [Output('amount_questions', 'children'),
+         Output('written_questions_graph', 'figure')],
+        [Input('date-range-written-questions', 'start_date'),
+         Input('date-range-written-questions', 'end_date'),
+         Input('x-axis-dropdown', 'value')]
+        )
+    def update_display(start_date, end_date, selected_axis):
+        # Filter data based on user input
+        written_questions_filtered_df = filter_data(start_date, end_date, 
+                                                    written_questions_df)
+    	# Obtain count of relevant data, after filtering
+        amount_questions = len(written_questions_filtered_df)
+        
+        # Create graph using user selected axis and filtered df
+        written_questions_graph = update_chart(selected_axis, 
+                                               written_questions_filtered_df)
     
-    # Create graph using user selected axis and filtered df
-    written_questions_graph = update_chart(selected_axis, 
-                                           written_questions_filtered_df)
-
-    return [f"Deze selectie resulteert in {amount_questions} relevante vergaderingen.", # Use text formatting to allow easier build of layout
-				written_questions_graph]
+        return [f"Deze selectie resulteert in {amount_questions} relevante vergaderingen.", # Use text formatting to allow easier build of layout
+    				written_questions_graph]
 
 
 
 # =============================================================================
 # Run dash app
 # =============================================================================
-if __name__ == '__main__':
-    app.run_server(debug=True)
+# # Comment out in integrated account
+# if __name__ == '__main__':
+#     app.run_server(debug=True)

@@ -5,6 +5,7 @@ from dash import dcc
 import attendance_permanent_members_per_comm_integrated
 import attendance_per_party_integrated
 import attendance_per_member_integrated 
+import written_questions
 
 
 app = dash.Dash(__name__, 
@@ -27,7 +28,7 @@ app.layout = html.Div([
                 children=[
                     "Het Vlaams Parlement geeft op haar ",
                     html.A("website", href="https://www.vlaamsparlement.be/nl/parlementair-werk/plenaire-vergadering/vergaderingen", target="_blank"),
-                    " een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een ",
+                    " een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Ook de schriftelijke vragen zijn beschikbaar. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een ",
                     html.A("API", href="https://ws.vlpar.be/e/opendata/api/", target="_blank"),
                     ". Onderstaande visualisaties laten toe om met deze gegevens te interageren."
                 ],
@@ -48,6 +49,9 @@ app.layout = html.Div([
         dcc.Tab(
             label='Aanwezigheid per parlementslid', 
             children=attendance_per_member_integrated.layout),
+        dcc.Tab(
+            label='Schriftelijke vragen', 
+            children=written_questions.layout),
         ]
 	),
 	# Footer with hyperlink to GitHub
@@ -66,6 +70,7 @@ app.layout = html.Div([
 attendance_permanent_members_per_comm_integrated.register_callbacks(app)
 attendance_per_party_integrated.register_callbacks(app)
 attendance_per_member_integrated.register_callbacks(app) 
+written_questions.register_callbacks(app)
 
 
 # Define a callable application object for Gunicorn
