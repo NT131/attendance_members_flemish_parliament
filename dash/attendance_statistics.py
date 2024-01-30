@@ -219,3 +219,26 @@ def obtain_counter_from_list_counter_likes(input_list, column_names_list):
 							  columns=column_names_list)
 			
 	return overall_df.sort_values(by='Aantal keer aanwezig', ascending=False)
+
+
+# Function to search values of dict and return key of match
+def find_key(dictionary, search_value):
+    for key, values in dictionary.items():
+        for value in values:
+            if search_value in value:
+                return key
+    return None  # Return None if the value is not found in any list
+
+    
+# Function to get party color based on the provided dictionary
+def get_party(row, facties_dict_input):
+    # Obtain member's name
+    parliamentarian_name = row['Parlementslid']
+    # Obtain party of member
+    party_of_member = find_key(dictionary = facties_dict_input,
+                               search_value = parliamentarian_name)
+    # if this yields no error: obtain relevant color
+    if party_of_member:
+        return party_of_member
+    else:
+        return None
