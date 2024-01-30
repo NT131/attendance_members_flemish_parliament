@@ -289,3 +289,9 @@ body {
     /* Add more styles as needed */
 }
 
+
+/* Center the DataTable container */
+.custom-datatable-container {
+    max-width: 1200px;
+    margin: auto;
+}
