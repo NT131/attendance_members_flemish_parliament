@@ -39,27 +39,6 @@ party_colors = {'Groen': '#83de62',
     'PVDA': '#AA050E'
  }
 
-# Map ministers to their party colors
-# minister_colors = {
-#     'Benjamin Dalle': '#f5822a',
-#     'Hilde Crevits': '#f5822a',
-#     'Jo Broens': '#f5822a',
-#     'Wouter Beke': '#f5822a',
-    
-#     'Ben Weyts': '#ffac12',
-#     'Jan Jambon': '#ffac12',
-#     'Matthias Diependaele': '#ffac12',
-#     'Zuhal Demir': '#ffac12',
-    
-#     'Bart Somers': '#003d6d',
-#     'Gwendolyne Rutten': '#003d6d',
-#     'Lydia Peeters': '#003d6d',
-#  }
-# minister_colors = {
-#     'cd&v': ['#f5822a', '#f5822a', '#f5822a', '#f5822a'],
-#     'N-VA': ['#ffac12', '#ffac12', '#ffac12', '#ffac12'],
-#     'Open Vld': ['#003d6d', '#003d6d', '#003d6d'],
-# }
 minister_colors = {
     'cd&v': '#f5822a',
     'N-VA': '#ffac12',
@@ -247,6 +226,9 @@ layout = html.Div(
                             id='datatable-info', 
                             style={'margin-top': '10px', 'font-size': '14px'}
                         ),
+                        dcc.Graph(
+                            id='question-duration-bar-plot',
+                        ),
                         dash_table.DataTable(
                             id='written-questions-table',
                             columns=[
@@ -369,7 +351,7 @@ def update_chart(selected_axis, written_questions_df_input):
                      # color='Thema',  # You can use 'color_discrete_map' if needed
                      labels={'x': 'Thema', 'y': 'Aantal vragen'},
                      title='Vragen per thema')
-
+  
     else:
         fig = px.bar()
 
