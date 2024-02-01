@@ -202,28 +202,36 @@ layout = html.Div(
                                 #         ),
                                 #     ]
                                 # ),
-                                dash_table.DataTable(
-                                    id='table_attendance',
-                                    # columns=[
-                                    #     {'name': 'Datum vraag gesteld', 'id': 'datum gesteld'},
-                                    #     {'name': 'Bevoegde minister', 'id': 'minister'},
-                                    #     # use markdown represention to leverage clickable links of df
-                                    #     {'name': 'Onderwerp', 'id': 'onderwerp', 'presentation': 'markdown'}, 
-                                    # ],
-                                    # page_size=25, #  Set the number of rows per page
-                                    style_table={'overflowX': 'auto'},
-                                    style_cell={
-                                        'fontFamily': 'Lato, sans-serif',
-                                        'fontSize': 14,
-                                        'textAlign': 'left',
-                                        'minWidth': '150px',
-                                        'whiteSpace': 'normal',
-                                        'textOverflow': 'ellipsis',
-                                    },
-                                    style_header={
-                                        'fontWeight': 'bold',
-                                        'fontSize': 16,
-                                    },
+                                
+                                # Table attendance_per_commission
+                                html.Div(
+                                    className="table-container",
+                                    children=[
+                                        dash_table.DataTable(
+                                            id='table_attendance',
+                                            # Rename columns in view
+                                            columns=[
+                                                {'name': 'Parlementslid', 'id': 'Naam vast lid'},
+                                                {'name': 'Vergaderingen aanwezig', 'id': 'Aantal keer aanwezig'},
+                                            ],
+                                            style_table={'overflowX': 'auto'},
+                                            style_cell={
+                                                'fontFamily': 'Lato, sans-serif',
+                                                'fontSize': 14,
+                                                'textAlign': 'left',
+                                                'minWidth': '150px',
+                                                'whiteSpace': 'normal',
+                                                'textOverflow': 'ellipsis',
+                                            },
+                                            style_header={
+                                                'fontWeight': 'bold',
+                                                'fontSize': 16,
+                                            },
+                                            # Allow sorting of columns
+                                            sort_action='native',  # Enable sorting
+                                            sort_mode='multi',  # Allow multiple column sorting
+                                        ),
+                                    ]
                                 ),
                             ],
                             style={"display": "flex", "flex-direction": "row"} # Set flexbox layout for row dispay to allow table and graph next to each other     
