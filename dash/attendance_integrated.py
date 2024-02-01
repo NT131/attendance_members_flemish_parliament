@@ -41,19 +41,56 @@ app.layout = html.Div([
     ),
     dcc.Tabs([
         dcc.Tab(
-            label='Aanwezigheid per commissie', 
-            children=attendance_permanent_members_per_comm_integrated.layout),
+            label='Aanwezigheid',
+            children=[
+                dcc.Tabs(
+                    children=[
+                        dcc.Tab(
+                            label='Aanwezigheid per commissie', 
+                            children=attendance_permanent_members_per_comm_integrated.layout),
+                        dcc.Tab(
+                            label='Aanwezigheid per partij', 
+                            children=attendance_per_party_integrated.layout),
+                        dcc.Tab(
+                            label='Aanwezigheid per parlementslid', 
+                            children=attendance_per_member_integrated.layout),
+                        ]
+                    ),
+                ],
+            ),
         dcc.Tab(
-            label='Aanwezigheid per partij', 
-            children=attendance_per_party_integrated.layout),
-        dcc.Tab(
-            label='Aanwezigheid per parlementslid', 
-            children=attendance_per_member_integrated.layout),
-        dcc.Tab(
-            label='Schriftelijke vragen', 
-            children=written_questions.layout),
+            label='Vragen',
+            children=[
+                dcc.Tabs(
+                    children=[
+                        # dcc.Tab(
+                        #     label='Mondelinge vragen',
+                        #     children = []),
+                        dcc.Tab(
+                            label='Schriftelijke vragen', 
+                            children=written_questions.layout),
+                        ]
+                    ),
+                ],
+            ),
         ]
 	),
+    
+#     dcc.Tabs([
+#         dcc.Tab(
+#             label='Aanwezigheid per commissie', 
+#             children=attendance_permanent_members_per_comm_integrated.layout),
+#         dcc.Tab(
+#             label='Aanwezigheid per partij', 
+#             children=attendance_per_party_integrated.layout),
+#         dcc.Tab(
+#             label='Aanwezigheid per parlementslid', 
+#             children=attendance_per_member_integrated.layout),
+#         dcc.Tab(
+#             label='Schriftelijke vragen', 
+#             children=written_questions.layout),
+#         ]
+# 	),
 	# Footer with hyperlink to GitHub
 	html.Footer(
 		className='footer', # Assign a class name for styling
