@@ -250,6 +250,11 @@ layout = html.Div(
                                 'fontWeight': 'bold',
                                 'fontSize': 16,
                             },
+                            # Allow sorting of columns
+                            sort_action='native',  # Enable sorting
+                            sort_mode='multi',  # Allow multiple column sorting
+                            sort_by=[{'column_id': 'datum gesteld', 'direction': 'desc'}],  # Default sorting column and orientation
+                            
                         ),
                     ], className='custom-datatable-container'),
                 ]
@@ -314,20 +319,7 @@ def update_chart(selected_axis, written_questions_df_input):
         # Apply function to create a new column 'Partij' based on fracties_dict
         grouped_data['Partij'] = grouped_data.apply(get_party, axis=1,
                                                     facties_dict_input=fracties_dict)
-# =============================================================================
-#       # Try out various possible plots
-        ## VIOLIN plot        
-        # fig = px.violin(grouped_data,
-        #                 # x='Parlementslid',
-        #                 # y='Aantal vragen',
-        #                 y='Parlementslid',
-        #                 x='Aantal vragen',
-        #                 color='Partij',
-        #                 color_discrete_map=party_colors,
-        #                 # box_width=0.2,
-        #                 labels={'x': 'Parlementslid', 'y': 'Aantal vragen'},
-        #                 title='Vragen per parlementslid')
-        # BAR plot
+
         fig = px.bar(grouped_data,
                       # x='Parlementslid',
                       # y='Aantal vragen',
@@ -338,45 +330,6 @@ def update_chart(selected_axis, written_questions_df_input):
                       labels={'x': 'Parlementslid', 'y': 'Aantal vragen'},
                       title='Vragen per parlementslid')
         
-
-        ## SCATTER plot       
-        # fig = px.scatter(
-        #     grouped_data,
-        #     # x='Parlementslid',
-        #     # y='Aantal vragen',
-        #     x='Partij',
-        #     y='Aantal vragen',
-        #     # size=dot_sizes,
-        #     # size=grouped_data['Aantal vragen'].apply(lambda x: x * 20),
-        #     size='Aantal vragen',
-        #     # color='blue',
-        #     color='Partij',
-        #     color_discrete_map=party_colors,
-        #     title='Vragen per parlementslid',
-        #     custom_data=["Parlementslid"],  # Include party name in custom data for hover label
-        #     category_orders={"Parlementslid": grouped_data['Parlementslid'].tolist()},  # Specify the order of categories
-        #     )
-        
-        # hover_text = (
-        #     grouped_data.apply(
-        #         lambda row: (
-        #             f"<b>{row['Parlementslid']}</b> stelde {row['Aantal vragen']} vragen."
-        #         ),
-        #         axis=1,
-        #     )
-        # )
-        
-        # fig.update_traces(
-        #     hovertemplate=(
-        #         "%{customdata}<br><extra></extra>"
-        #     ),
-        #     customdata=hover_text,
-        # )
-# =============================================================================
-
-        
-        # # Update x-axis to reflect the sorted order
-        # fig.update_xaxes(categoryorder='total descending')
         
         # Update y-axis to reflect the sorted order
         fig.update_yaxes(categoryorder='total ascending')
@@ -385,26 +338,18 @@ def update_chart(selected_axis, written_questions_df_input):
         fig.update_layout(
             height=2000,  # Set the height of the figure
             bargap=0.2,  # Set the gap between bars
-            # xaxis=dict( # Show x-axis also at top of graph
-            #     mirror=True,  # Show ticks and labels on both left and right
-            #     showline=True,  # Show axis line
-            #     showgrid=False,  # Hide grid lines
-            # ),
         )
         
-        
-        # fig.update_traces(
-        #     customdata=["Parlementslid"],  # Include party name in custom data for hover label
-        #     hovertemplate="%{customdata}<br><extra></extra>",
-        #     marker=dict(line=dict(width=0.5, color='black')),
-        #     width=20, # Set a fixed height for each bar
-        # )
-        
-        # # Adjust the gap between bars to achieve a similar effect to fixed bar height
+        # # Adjust the space between y-axis labels and the axis
         # fig.update_layout(
-        #     bargap=0.2,  # Adjust the gap as needed
-        #     uniformtext_minsize=0.4 * 10,  # Adjust the size factor as needed
+        #     yaxis=dict(
+        #         tickmode='array',  # Set tickmode to 'array'
+        #         tickvals=fig.data[0]['y'],  # Use the actual y values as tickvals
+        #         tick0=-0.8,  # Adjust the tick0 to control the space
+        #         dtick=1  # Set dtick to control the interval between ticks
+        #     )
         # )
+
 
     elif selected_axis == 'minister':
         grouped_data = written_questions_df_input['minister'].value_counts().reset_index()
