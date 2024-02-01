@@ -23,18 +23,6 @@ app.layout = html.Div([
                 className="header-title",
                 style={"color": "#FFFFFF"}
             ),
-            # # Description
-            # html.P(
-            #     children=[
-            #         "Het Vlaams Parlement geeft op haar ",
-            #         html.A("website", href="https://www.vlaamsparlement.be/nl/parlementair-werk/plenaire-vergadering/vergaderingen", target="_blank"),
-            #         " een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Ook de schriftelijke vragen zijn beschikbaar. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een ",
-            #         html.A("API", href="https://ws.vlpar.be/e/opendata/api/", target="_blank"),
-            #         ". Onderstaande visualisaties laten toe om met deze gegevens te interageren."
-            #     ],
-            #     className="header-description",
-            #     style={"color": "#FFFFFF"}
-            # ),
             
             # Markdown description (simpler than htlm.P for including hyperlinks)
             dcc.Markdown(
@@ -89,21 +77,6 @@ app.layout = html.Div([
         ]
 	),
     
-#     dcc.Tabs([
-#         dcc.Tab(
-#             label='Aanwezigheid per commissie', 
-#             children=attendance_permanent_members_per_comm_integrated.layout),
-#         dcc.Tab(
-#             label='Aanwezigheid per partij', 
-#             children=attendance_per_party_integrated.layout),
-#         dcc.Tab(
-#             label='Aanwezigheid per parlementslid', 
-#             children=attendance_per_member_integrated.layout),
-#         dcc.Tab(
-#             label='Schriftelijke vragen', 
-#             children=written_questions.layout),
-#         ]
-# 	),
 	# Footer with hyperlink to GitHub
 	html.Footer(
 		className='footer', # Assign a class name for styling
