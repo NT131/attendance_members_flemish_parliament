@@ -11,7 +11,7 @@ import written_questions
 app = dash.Dash(__name__, 
 		url_base_pathname='/visualisaties/aanwezigheid-vlaams-parlement/',
 		assets_folder='assets') # Relative path to the folder of css file)
-app.title = "Aanwezigheid in commissies waarvan parlementsleden vast lid zijn" # title of tab in browser
+app.title = "Betrokkenheid Vlaamse parlementsleden" # title of tab in browser
 
 app.layout = html.Div([
     # Header section
@@ -19,19 +19,32 @@ app.layout = html.Div([
         children=[
             # Title
             html.H1(
-                children="Aanwezigheid Vlaamse parlementsleden",
+                children="Betrokkenheid Vlaamse parlementsleden",
                 className="header-title",
                 style={"color": "#FFFFFF"}
             ),
-            # Description
-            html.P(
-                children=[
-                    "Het Vlaams Parlement geeft op haar ",
-                    html.A("website", href="https://www.vlaamsparlement.be/nl/parlementair-werk/plenaire-vergadering/vergaderingen", target="_blank"),
-                    " een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Ook de schriftelijke vragen zijn beschikbaar. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een ",
-                    html.A("API", href="https://ws.vlpar.be/e/opendata/api/", target="_blank"),
-                    ". Onderstaande visualisaties laten toe om met deze gegevens te interageren."
-                ],
+            # # Description
+            # html.P(
+            #     children=[
+            #         "Het Vlaams Parlement geeft op haar ",
+            #         html.A("website", href="https://www.vlaamsparlement.be/nl/parlementair-werk/plenaire-vergadering/vergaderingen", target="_blank"),
+            #         " een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. Ook de schriftelijke vragen zijn beschikbaar. Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een ",
+            #         html.A("API", href="https://ws.vlpar.be/e/opendata/api/", target="_blank"),
+            #         ". Onderstaande visualisaties laten toe om met deze gegevens te interageren."
+            #     ],
+            #     className="header-description",
+            #     style={"color": "#FFFFFF"}
+            # ),
+            
+            # Markdown description (simpler than htlm.P for including hyperlinks)
+            dcc.Markdown(
+                """               
+                Het Vlaams Parlement geeft op haar [website](https://www.vlaamsparlement.be/nl/parlementair-werk/plenaire-vergadering/vergaderingen) 
+                een overzicht van elke vergadering van elke commissie, en welke vertegenwoordigers hier aanwezig waren. 
+                Ook de schriftelijke vragen zijn beschikbaar. 
+                Het Vlaams Parlement stelt deze gegevens ook beschikbaar via een [API](https://ws.vlpar.be/e/opendata/api/). 
+                Onderstaande visualisaties laten toe om met deze gegevens te interageren.
+                """,
                 className="header-description",
                 style={"color": "#FFFFFF"}
             )
