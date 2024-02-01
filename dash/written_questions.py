@@ -8,6 +8,7 @@ from dash.dependencies import Input, Output
 
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 import pickle
 
@@ -226,9 +227,7 @@ layout = html.Div(
                             id='datatable-info', 
                             style={'margin-top': '10px', 'font-size': '14px'}
                         ),
-                        dcc.Graph(
-                            id='question-duration-bar-plot',
-                        ),
+
                         dash_table.DataTable(
                             id='written-questions-table',
                             columns=[
@@ -255,6 +254,16 @@ layout = html.Div(
                     ], className='custom-datatable-container'),
                 ]
             ),
+            # dcc.Tab(
+            #     label='Antwoordtermijn',
+            #     children=[
+            #         html.Div([
+            #             dcc.Graph(
+            #                 id='question-duration-bar-plot',
+            #             ),
+            #         ]),
+            #     ]
+            # )
         ]),
     ],
     # use CSS flexbox approach to easily structure graphs and titles
@@ -305,17 +314,97 @@ def update_chart(selected_axis, written_questions_df_input):
         # Apply function to create a new column 'Partij' based on fracties_dict
         grouped_data['Partij'] = grouped_data.apply(get_party, axis=1,
                                                     facties_dict_input=fracties_dict)
-
+# =============================================================================
+#       # Try out various possible plots
+        ## VIOLIN plot        
+        # fig = px.violin(grouped_data,
+        #                 # x='Parlementslid',
+        #                 # y='Aantal vragen',
+        #                 y='Parlementslid',
+        #                 x='Aantal vragen',
+        #                 color='Partij',
+        #                 color_discrete_map=party_colors,
+        #                 # box_width=0.2,
+        #                 labels={'x': 'Parlementslid', 'y': 'Aantal vragen'},
+        #                 title='Vragen per parlementslid')
+        # BAR plot
         fig = px.bar(grouped_data,
-                     x='Parlementslid',
-                     y='Aantal vragen',
-                     color='Partij',
-                     color_discrete_map=party_colors,
-                     labels={'x': 'Parlementslid', 'y': 'Aantal vragen'},
-                     title='Vragen per parlementslid')
+                      # x='Parlementslid',
+                      # y='Aantal vragen',
+                      x='Aantal vragen',
+                      y='Parlementslid',
+                      color='Partij',
+                      color_discrete_map=party_colors,
+                      labels={'x': 'Parlementslid', 'y': 'Aantal vragen'},
+                      title='Vragen per parlementslid')
         
-        # Update x-axis to reflect the sorted order
-        fig.update_xaxes(categoryorder='total descending')
+
+        ## SCATTER plot       
+        # fig = px.scatter(
+        #     grouped_data,
+        #     # x='Parlementslid',
+        #     # y='Aantal vragen',
+        #     x='Partij',
+        #     y='Aantal vragen',
+        #     # size=dot_sizes,
+        #     # size=grouped_data['Aantal vragen'].apply(lambda x: x * 20),
+        #     size='Aantal vragen',
+        #     # color='blue',
+        #     color='Partij',
+        #     color_discrete_map=party_colors,
+        #     title='Vragen per parlementslid',
+        #     custom_data=["Parlementslid"],  # Include party name in custom data for hover label
+        #     category_orders={"Parlementslid": grouped_data['Parlementslid'].tolist()},  # Specify the order of categories
+        #     )
+        
+        # hover_text = (
+        #     grouped_data.apply(
+        #         lambda row: (
+        #             f"<b>{row['Parlementslid']}</b> stelde {row['Aantal vragen']} vragen."
+        #         ),
+        #         axis=1,
+        #     )
+        # )
+        
+        # fig.update_traces(
+        #     hovertemplate=(
+        #         "%{customdata}<br><extra></extra>"
+        #     ),
+        #     customdata=hover_text,
+        # )
+# =============================================================================
+
+        
+        # # Update x-axis to reflect the sorted order
+        # fig.update_xaxes(categoryorder='total descending')
+        
+        # Update y-axis to reflect the sorted order
+        fig.update_yaxes(categoryorder='total ascending')
+        
+        # Modify height of entire graph (static) to ensure all entries are properly shown 
+        fig.update_layout(
+            height=2000,  # Set the height of the figure
+            bargap=0.2,  # Set the gap between bars
+            # xaxis=dict( # Show x-axis also at top of graph
+            #     mirror=True,  # Show ticks and labels on both left and right
+            #     showline=True,  # Show axis line
+            #     showgrid=False,  # Hide grid lines
+            # ),
+        )
+        
+        
+        # fig.update_traces(
+        #     customdata=["Parlementslid"],  # Include party name in custom data for hover label
+        #     hovertemplate="%{customdata}<br><extra></extra>",
+        #     marker=dict(line=dict(width=0.5, color='black')),
+        #     width=20, # Set a fixed height for each bar
+        # )
+        
+        # # Adjust the gap between bars to achieve a similar effect to fixed bar height
+        # fig.update_layout(
+        #     bargap=0.2,  # Adjust the gap as needed
+        #     uniformtext_minsize=0.4 * 10,  # Adjust the size factor as needed
+        # )
 
     elif selected_axis == 'minister':
         grouped_data = written_questions_df_input['minister'].value_counts().reset_index()
@@ -331,6 +420,9 @@ def update_chart(selected_axis, written_questions_df_input):
         # Update x-axis to reflect the sorted order
         fig.update_xaxes(categoryorder='total descending')
         
+        # Reset height of entire graph (enlarged for 'vraagsteller)
+        fig.update_layout(height=500)
+        
     elif selected_axis == 'partij':
         grouped_data = written_questions_df_input['vraagsteller_partij'].value_counts().reset_index()
         grouped_data.columns = ['Partij', 'Aantal vragen']
@@ -342,15 +434,26 @@ def update_chart(selected_axis, written_questions_df_input):
                      labels={'x': 'Partij', 'y': 'Aantal vragen'},
                      title='Vragen gesteld per partij')
         
+        # Reset height of entire graph (enlarged for 'vraagsteller)
+        fig.update_layout(height=500)
+        
     elif selected_axis == 'thema':
         grouped_data = written_questions_df_input['thema'].value_counts().reset_index()
         grouped_data.columns = ['Thema', 'Aantal vragen']
         fig = px.bar(grouped_data,
-                     x='Thema',
-                     y='Aantal vragen',
+                     x='Aantal vragen',
+                     y='Thema',
                      # color='Thema',  # You can use 'color_discrete_map' if needed
                      labels={'x': 'Thema', 'y': 'Aantal vragen'},
                      title='Vragen per thema')
+        
+        # Modify height of entire graph (static) to ensure all entries are properly shown 
+        fig.update_layout(
+            height=600,  # Set the height of the figure
+            bargap=0.2,  # Set the gap between bars
+            )
+        # Update y-axis to reflect the sorted order
+        fig.update_yaxes(categoryorder='total ascending')
   
     else:
         fig = px.bar()
@@ -359,11 +462,41 @@ def update_chart(selected_axis, written_questions_df_input):
 
 
 
+# def answer_term_bar_chart(written_questions_df_input, num_bins=20):
+#     # Ensure 'termijn antwoord (werkdagen)' is converted to numeric
+#     written_questions_df_input['termijn antwoord (werkdagen)'] = pd.to_numeric(written_questions_df_input['termijn antwoord (werkdagen)'], errors='coerce')
+
+#     # Create bins using pd.cut
+#     written_questions_df_input['termijn bins'] = pd.cut(written_questions_df_input['termijn antwoord (werkdagen)'], bins=num_bins)
+
+#     # Group by the bins and count the number of questions in each bin
+#     bin_counts = written_questions_df_input.groupby('termijn bins').size().reset_index(name='Number of Questions')
+
+#     # Create the bar chart using px.bar
+#     fig = px.bar(
+#         bin_counts,
+#         x='termijn bins',
+#         y='Number of Questions',
+#         labels={'termijn bins': 'Time to Answer (Workdays)', 'Number of Questions': 'Number of Questions'},
+#         title='Distribution of Time to Answer Questions',
+#         color_discrete_sequence=['skyblue'],  # Bar color
+#     )
+
+#     # # Customize layout
+#     # fig.update_layout(
+#     #     showlegend=False,  # Hide legend for a single bar
+#     # )
+
+#     return fig
+
+
+
 #Create function to load app in integrated appraoch
 def register_callbacks(app):
     @app.callback(
         [Output('amount_questions', 'children'),
          Output('written_questions_graph', 'figure'),
+         # Output('question-duration-bar-plot', 'figure'),
          Output('written-questions-table', 'data'),
          Output('datatable-info', 'children')],
         [Input('date-range-written-questions', 'start_date'),
@@ -379,13 +512,14 @@ def register_callbacks(app):
         written_questions_filtered_df = filter_data(start_date, end_date,
                                                     theme_filter, minister_filter,
                                                     written_questions_df)
-    	# Obtain count of relevant data, after filtering
-        amount_questions = len(written_questions_filtered_df)
         
         # Create graph using user selected axis and filtered df
         written_questions_graph = update_chart(selected_axis, 
                                                written_questions_filtered_df)
           
+        # # Create graph for answering term
+        # duration_answer_graph = answer_term_bar_chart(written_questions_filtered_df)
+        
         # Check if the selected axis is 'vraagsteller' to update DataTable
         if selected_axis == 'vraagsteller' and selected_member:
             # Filter data for the selected member
@@ -395,8 +529,9 @@ def register_callbacks(app):
             # If the selected axis is not 'vraagsteller', provide an empty DataFrame
             selected_member_data = pd.DataFrame()
          
-        return [f"Deze selectie resulteert in {amount_questions} relevante schriftelijke vragen.", # Use text formatting to allow easier build of layout
+        return [f"Deze selectie resulteert in {len(written_questions_filtered_df)} relevante schriftelijke vragen.", # Use text formatting to allow easier build of layout
                 written_questions_graph,
+                # duration_answer_graph,
                 selected_member_data.to_dict('records'),
                 f"Dit parlementslid stelde {len(selected_member_data)} vragen."]
 
