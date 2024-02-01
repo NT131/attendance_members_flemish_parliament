@@ -177,16 +177,53 @@ layout = html.Div(
                                     className="graph-title",
                                 ),
                                 # Table attendance_per_commission
-                                html.Div(
-                                    className="table-container",
-                                    children=[
-                                        html.Div(
-                                            # Display the table_attendance
-                                            id='table_attendance',
-                                            className="dash-table",
-                                            children=html.P("Tabel niet beschikbaar", style={"color": "red"})
-                                        ),
-                                    ]
+                                # html.Div(
+                                #     className="table-container",
+                                #     children=[
+                                #         html.Div(
+                                #             # Display the table_attendance
+                                #             id='table_attendance',
+                                #             # className="dash-table",
+                                #             style_table={'overflowX': 'auto'},
+                                #             # style_cell={
+                                #             #     'fontFamily': 'Lato, sans-serif',
+                                #             #     'fontSize': 14,
+                                #             #     'textAlign': 'left',
+                                #             #     'minWidth': '150px',
+                                #             #     'whiteSpace': 'normal',
+                                #             #     'textOverflow': 'ellipsis',
+                                #             # },
+                                #             style_header={
+                                #                 'fontWeight': 'bold',
+                                #                 'fontSize': 16,
+                                #             },
+                                #             className="custom-datatable-container",
+                                #             children=html.P("Tabel niet beschikbaar", style={"color": "red"})
+                                #         ),
+                                #     ]
+                                # ),
+                                dash_table.DataTable(
+                                    id='table_attendance',
+                                    # columns=[
+                                    #     {'name': 'Datum vraag gesteld', 'id': 'datum gesteld'},
+                                    #     {'name': 'Bevoegde minister', 'id': 'minister'},
+                                    #     # use markdown represention to leverage clickable links of df
+                                    #     {'name': 'Onderwerp', 'id': 'onderwerp', 'presentation': 'markdown'}, 
+                                    # ],
+                                    # page_size=25, #  Set the number of rows per page
+                                    style_table={'overflowX': 'auto'},
+                                    style_cell={
+                                        'fontFamily': 'Lato, sans-serif',
+                                        'fontSize': 14,
+                                        'textAlign': 'left',
+                                        'minWidth': '150px',
+                                        'whiteSpace': 'normal',
+                                        'textOverflow': 'ellipsis',
+                                    },
+                                    style_header={
+                                        'fontWeight': 'bold',
+                                        'fontSize': 16,
+                                    },
                                 ),
                             ],
                             style={"display": "flex", "flex-direction": "row"} # Set flexbox layout for row dispay to allow table and graph next to each other     
@@ -310,10 +347,39 @@ def update_table(df):
 
     return table  # Return a list containing the table element
 
+    # table = dash_table.DataTable(
+    #     id='written-questions-table',
+    #     data=df,
+    #     # columns=[
+    #     #     {'name': 'Parlementslid', 'id': 'Naam vast lid'},
+    #     #     {'name': 'Bevoegde minister', 'id': 'minister'},
+    #     #     # use markdown represention to leverage clickable links of df
+    #     #     {'name': 'Onderwerp', 'id': 'onderwerp', 'presentation': 'markdown'}, 
+    #     # ],
+    #     # page_size=25, #  Set the number of rows per page
+    #     style_table={'overflowX': 'auto'},
+    #     style_cell={
+    #         'fontFamily': 'Lato, sans-serif',
+    #         'fontSize': 14,
+    #         'textAlign': 'left',
+    #         'minWidth': '150px',
+    #         'whiteSpace': 'normal',
+    #         'textOverflow': 'ellipsis',
+    #     },
+    #     style_header={
+    #         'fontWeight': 'bold',
+    #         'fontSize': 16,
+    #     },
+    # )
+    
+    return table
+
 
 def update_dash_table(df):
 
     datatable = dash_table.DataTable(data=df.to_dict('records'))
+    
+    
 
     return datatable  # Return a list containing the table element
 
@@ -325,7 +391,8 @@ def register_callbacks(app):
         [
 		Output('amount_meetings_per_com', 'children'),
 		Output('graphs_container', 'children'),
-        Output('table_attendance', 'children')
+        # Output('table_attendance', 'children'),
+        Output('table_attendance', 'data'),
 		],
         [Input('commissie-dropdown-per-com', 'value'),
          Input('date-range-per-com', 'start_date'),
@@ -349,8 +416,8 @@ def register_callbacks(app):
             # Option 1: use normal table
         # table_attendance = update_table(attendance_permanent_df) 
             # Option 2: use dash_table
-        table_attendance = update_dash_table(attendance_permanent_df)
-
+        # table_attendance = update_dash_table(attendance_permanent_df)
+        table_attendance = attendance_permanent_df.to_dict('records')
 
     	# Update the pie charts based on the selected data
         pie_charts = update_pie_charts(filtered_df_overview)
