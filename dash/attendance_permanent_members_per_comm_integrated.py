@@ -229,7 +229,7 @@ layout = html.Div(
                                             },
                                             # Allow sorting of columns
                                             sort_action='native',  # Enable sorting
-                                            sort_mode='multi',  # Allow multiple column sorting
+                                            sort_mode='single',  # Allow only to sort on 1 column sorting
                                             sort_by=[{'column_id': 'Aantal keer aanwezig', 'direction': 'desc'}],  # Default sorting column and orientation
                                         ),
                                     ]
