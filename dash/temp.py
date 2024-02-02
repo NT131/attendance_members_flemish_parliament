@@ -19,6 +19,11 @@ import pickle
 import webbrowser
 from dash.exceptions import PreventUpdate
 
+import locale
+
+# Set the locale to Belgian Dutch
+locale.setlocale(locale.LC_ALL, 'nl_BE.utf8')
+
 from attendance_statistics import get_party
 
 # Load df with written questions and information about parties
@@ -105,9 +110,13 @@ app.layout = html.Div([
 
 # Function to split data based on the provided threshold
 def split_data_on_threshold(df, threshold: int):
+    # Filter out questions that are not yet answered (i.e. NaN)
+    df_filtered = df[(~df['termijn antwoord (werkdagen)'].isna()) & 
+                     (df['termijn antwoord (werkdagen)'] != 0)]
+    
     # Split the dataset based on the threshold value
-    df_below_threshold = df[df['termijn antwoord (werkdagen)'] <= threshold]
-    df_above_threshold = df[df['termijn antwoord (werkdagen)'] > threshold]
+    df_below_threshold = df_filtered[df_filtered['termijn antwoord (werkdagen)'] <= threshold]
+    df_above_threshold = df_filtered[df_filtered['termijn antwoord (werkdagen)'] > threshold]
 
     # Add new column to indicate party of the relevant minister
     df_above_threshold['Partij minister'] = df_above_threshold['minister'].map(minister_groups)
@@ -120,26 +129,49 @@ def split_data_on_threshold(df, threshold: int):
 
 # Function to get bar plot for dataset below threshold
 def bar_fig_below_threshold(df, threshold):
+    # Adjust the height of the bars in function of how many bars there are (fixed height for each bar), with a fixed minimum of pixels
+    bar_heigth = max(df['termijn antwoord (werkdagen)'].max() * 20, 700)
+    # print(bar_heigth, df['termijn antwoord (werkdagen)'].max())
+    
     figure=px.bar(df,
                   x='count', 
                   y='termijn antwoord (werkdagen)',
                   labels={'termijn antwoord (werkdagen)': 'Antwoordtermijn (werkdagen)', 'count': 'Aantal vragen'},
-                  title=f"Vragen beantwoord binnen {threshold} werkdagen",
+                  # title=f"Vragen beantwoord binnen {threshold} werkdagen",
+                  # use html in title to create subtitle
+                  title=(
+                        # f"Vragen beantwoord binnen {threshold} werkdagen: {df['count'].sum():,}".replace(",", " ")  # Replace commas with spaces to get space separator for thousands, instead of comma
+                      f"Vragen beantwoord binnen {threshold} werkdagen: {locale.format_string('%d', df['count'].sum(), grouping=True)}"
+                      # f"Vragen beantwoord binnen {threshold} werkdagen:"
+                      # f" <br><br>"
+                      # f"<sup>Totaal aantal vragen beantwoord deze periode: {df['count'].sum()}</sup>"
+                      # f" <br><br>"
+                      ),
                   orientation='h',
+                  height=bar_heigth,
+                  # hover_data=['termijn antwoord (werkdagen)', 'count'],
+                    custom_data=['termijn antwoord (werkdagen)', 'count'],  # Include additional data in custom_data
+                  # text=df['count'],  # Set the text to the 'count' column for labels
                   )
+
     
-   # Update the y-axis category order
-    figure.update_yaxes(categoryorder='total ascending')
+    # Move x-axis ticks, labels, and title to the top
+    figure.update_xaxes(side='top')
+    
+    # Reverse the y-axis order
+    # figure.update_yaxes(categoryorder='total descending')
+    figure.update_yaxes(autorange="reversed")
+
     
     # Add red horizontal line at position 20
     figure.add_shape(
         go.layout.Shape(
             type="line",
             x0=0, # start line at 0
-            x1=df['count'].max() * 1.1, # continue line up until highest amount of questions + 20% further
-            y0=20,
-            y1=20,
-            line=dict(color="red", width=1),
+            x1=df['count'].max() * 1.1, # continue line up until highest amount of questions + 10% further
+            y0=20.5, # set starting y-coordinate of line just above bar of 20
+            y1=20.5,#  set ending y-coordinate of line just above bar of 20
+            line=dict(color="red", width=2),
         ),
     )
     
@@ -147,7 +179,7 @@ def bar_fig_below_threshold(df, threshold):
     figure.add_annotation(
         go.layout.Annotation(
             x=df['count'].max() / 2,
-            y=25,
+            y=15,
             xref="x",  
             yref="y",
             text="Reglementaire antwoordtermijn: 20 werkdagen",
@@ -155,25 +187,78 @@ def bar_fig_below_threshold(df, threshold):
         ),
     )
     
+    # # Set textposition to 'outside' to move labels outside the bars
+    # figure.update_traces(textposition='outside')
+    
+    # Set custom hover template
+    figure.update_traces(
+        hovertemplate=(
+            # "<b>Antwoordtermijn:</b> %{customdata[0] - customdata[0] + 5} werkdagen<br>"
+            # "<b>Aantal vragen:</b> %{customdata[1]}<extra></extra>"
+            "%{customdata[1]} vragen werden beantwoord na %{customdata[0]} werkdagen."
+            "<extra></extra>"
+        ),
+    )
+
+    
     return figure
+
+# def bar_fig_below_threshold(df, threshold):
+#     figure = go.Figure(data=[
+
+#         go.Histogram(
+#             # x=df['count'],
+#             # y=df['termijn antwoord (werkdagen)'],
+#             x=df,
+#             # labels={'termijn antwoord (werkdagen)': 'Antwoordtermijn (werkdagen)', 'count': 'Aantal vragen'},
+#             # title=f"Vragen beantwoord binnen {threshold} werkdagen",
+#             # use html in title to create subtitle
+#             # title=(
+#             #       f"Vragen beantwoord binnen {threshold} werkdagen: {df['count'].sum()}"
+#             #     # f"Vragen beantwoord binnen {threshold} werkdagen:"
+#             #     # f" <br><br>"
+#             #     # f"<sup>Totaal aantal vragen beantwoord deze periode: {df['count'].sum()}</sup>"
+#             #     # f" <br><br>"
+#             #     ),
+#             # orientation='h',
+#             # height=bar_heigth,
+#             # # hover_data=['termijn antwoord (werkdagen)', 'count'],
+#             # custom_data=['termijn antwoord (werkdagen)', 'count'],  # Include additional data in custom_data
+#             # text=df['count'],  # Set the text to the 'count' column for labels
+#             cumulative_enabled=True
+#             )
+#         ])
+#     return figure
 
 # Function to get scatter plot for dataset above threshold
 def scatter_fig_above_threshold(df, threshold):
+    # Adjust the height of the bars in function of how many bars there are (fixed height for each bar), with a fixed maximum of pixels
+    graph_heigth = min(df['termijn antwoord (werkdagen)'].max() * 5, 1000)
+    
     figure = px.scatter(df, 
-                        x='termijn antwoord (werkdagen)',
-                        y='minister',
+                        # x='termijn antwoord (werkdagen)',
+                        # y='minister',
+                        x='minister',
+                        y='termijn antwoord (werkdagen)',
                         color='vraagsteller_partij',
                         color_discrete_map=party_colors,
                         labels={'termijn antwoord (werkdagen)': 'Antwoordtermijn (werkdagen)', 
                                 'minister': 'Verantwoordelijke minister',
                                 'vraagsteller_partij': 'Partij parlementslid dat vraag stelde'},
-                        title=f"Vragen beantwoord binnen {threshold} werkdagen",
+                        # use html in title to create subtitle
+                        title=(
+                            f"Vragen beantwoord na {threshold} werkdagen: {len(df)}"
+                            # f"Vragen beantwoord na {threshold} werkdagen: "
+                            # f" <br><br>"
+                            # f"<sup>Totaal aantal vragen beantwoord deze periode: {len(df)}</sup>"
+                            ),
                         # Use hover_data parameter and refer to it here instead of directly in hovertemplate text.
                         # Otherwise, this replaces layers, impacting e.g. colors. 
                         # See https://community.plotly.com/t/scatter-plot-color-and-clickdata-mismatch/66568
                         # Only include variables in hoverlabel that are not yet used in the graph, such as in x and y
                         hover_data=['vraagsteller', 'vraagsteller_partij', 'datum gesteld', 'onderwerp', 'url'],
-                        category_orders={'minister': 'total ascending'},
+                        # category_orders={'minister': 'total ascending'},
+                        height=graph_heigth,
                         )
 
     # Custom hover template
@@ -199,6 +284,15 @@ def scatter_fig_above_threshold(df, threshold):
             font=dict(size=12, color="gray"),
         )
     ])
+    
+    # Do not show vertical gridline
+    figure.update_xaxes(showgrid=False),    
+
+    # Move x-axis ticks, labels, and title to the top
+    figure.update_xaxes(side='top')
+    
+    # Reverse the y-axis order
+    figure.update_yaxes(autorange="reversed")
 
     return figure
 
