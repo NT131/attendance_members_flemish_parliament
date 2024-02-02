@@ -91,13 +91,16 @@ app.layout = html.Div([
 
     dcc.Graph(
         id='bar-plot',
-        figure=graph_below_threshold,
+        # figure=graph_below_threshold,
     ),
     
     dcc.Graph(
         id='scatter-plot',
-        figure=graph_above_threshold,
-    )
+        # figure=graph_above_threshold,
+    ),
+    # Hidden div as placeholder for output callback of clickable datapoints
+    html.Div(id='hidden-div', style={'display': 'none'})  
+
 ])
 
 # Function to split data based on the provided threshold
@@ -127,6 +130,30 @@ def bar_fig_below_threshold(df, threshold):
     
    # Update the y-axis category order
     figure.update_yaxes(categoryorder='total ascending')
+    
+    # Add red horizontal line at position 20
+    figure.add_shape(
+        go.layout.Shape(
+            type="line",
+            x0=0, # start line at 0
+            x1=df['count'].max() * 1.1, # continue line up until highest amount of questions + 20% further
+            y0=20,
+            y1=20,
+            line=dict(color="red", width=1),
+        ),
+    )
+    
+    # Add label for the line
+    figure.add_annotation(
+        go.layout.Annotation(
+            x=df['count'].max() / 2,
+            y=25,
+            xref="x",  
+            yref="y",
+            text="Reglementaire antwoordtermijn: 20 werkdagen",
+            showarrow=False,
+        ),
+    )
     
     return figure
 
@@ -159,52 +186,65 @@ def scatter_fig_above_threshold(df, threshold):
             "<extra></extra>" # This is needed to ensure that all elements from hover_data are shown (vs. default of only showing subset)
         ),
     )
+    
+    # Add footnote to indicate clickable nature of data points
+    figure.update_layout(annotations=[
+        dict(
+            x=0, # left side
+            y=-0.15,
+            showarrow=False,
+            text="Klik op datapunt voor meer informatie",
+            xref="paper",
+            yref="paper",
+            font=dict(size=12, color="gray"),
+        )
+    ])
 
     return figure
 
 
-
 @app.callback(
-        [Output('bar-plot', 'figure'), 
-        Output('scatter-plot', 'figure')],
-        [Input('threshold', 'int')])
-
-def update_reply_term_graphs(threshold):
-    
-    (df_below_threshold_grouped_filtered, 
-     df_above_threshold_filtered) = split_data_on_threshold(
-         written_questions_df, 
-         threshold)
-    
-    graph_below_threshold = bar_fig_below_threshold(
-        df_below_threshold_grouped_filtered,
-        threshold)
-    
-    graph_above_threshold = scatter_fig_above_threshold(
-        df_above_threshold_filtered,
-        threshold)
-    
-    return graph_below_threshold, graph_above_threshold
-
-
-
-
-
-@app.callback(
-        Output('scatter-plot', 'figure'), 
-        [Input('scatter-plot', 'clickData')])
-
-
+    Output('hidden-div', 'children'),  # Use a hidden div as a dummy output
+    [Input('scatter-plot', 'clickData')]
+)
 # Make Datapoints of scatterplot clickable, returning webpage of question
 # see https://stackoverflow.com/questions/25148462/open-a-url-by-clicking-a-data-point-in-plotly
 def open_url(clickData):
-    if clickData != None:
-        # Obtain url as stored in customdata
+    if clickData is not None:
         url = clickData['points'][0]['customdata'][4]
-        # Navigate to url in new tab of webbrowser
         webbrowser.open_new_tab(url)
     else:
         raise PreventUpdate
 
+@app.callback(
+    [Output('bar-plot', 'figure'), 
+    Output('scatter-plot', 'figure')],
+    [Input('threshold', 'value')])
+
+def update_graph(threshold):
+    df_below_threshold_grouped_filtered, df_above_threshold_filtered = split_data_on_threshold(
+        written_questions_df, threshold
+    )
+
+    graph_below_threshold = bar_fig_below_threshold(
+        df_below_threshold_grouped_filtered, threshold
+    )
+
+    graph_above_threshold = scatter_fig_above_threshold(
+        df_above_threshold_filtered, threshold
+    )
+
+    return graph_below_threshold, graph_above_threshold
+
+
+
 if __name__ == '__main__':
     app.run_server(debug=True)
+
+
+
+
+
+
+
+
