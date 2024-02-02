@@ -397,9 +397,11 @@ def update_attendance_per_party_graph(attendance_per_party_percentage):
     index = np.arange(len(sorted_parties))
 
     # Create traces for each bar section
-    trace_aanwezig = go.Bar(y=sorted_parties, x=bars_aanwezig, orientation='h', name='Aanwezig', marker=dict(color='green'), hoverinfo='x', hovertemplate='%{x:.1f}%')  # Display value on hover, in percentage format
-    trace_afwezig = go.Bar(y=sorted_parties, x=bars_afwezig, orientation='h', name='Afwezig', marker=dict(color='red'), hoverinfo='x', hovertemplate='%{x:.1f}%')  # Display value on hover, in percentage format
-    trace_verontschuldigd = go.Bar(y=sorted_parties, x=bars_verontschuldigd, orientation='h', name='Verontschuldigd', marker=dict(color='orange'), hoverinfo='x', hovertemplate='%{x:.1f}%')  # Display value on hover, in percentage format
+    # <extra></extra> tag removes the part of the hover where the trace name is usually displayed in a contrasting color
+    # see https://plotly.com/python/hover-text-and-formatting/
+    trace_aanwezig = go.Bar(y=sorted_parties, x=bars_aanwezig, orientation='h', name='Aanwezig', marker=dict(color='green'), hoverinfo='x', hovertemplate='%{x:.1f}%<extra></extra>')  # Display value on hover, in percentage format
+    trace_afwezig = go.Bar(y=sorted_parties, x=bars_afwezig, orientation='h', name='Afwezig', marker=dict(color='red'), hoverinfo='x', hovertemplate='%{x:.1f}%<extra></extra>')  # Display value on hover, in percentage format
+    trace_verontschuldigd = go.Bar(y=sorted_parties, x=bars_verontschuldigd, orientation='h', name='Verontschuldigd', marker=dict(color='orange'), hoverinfo='x', hovertemplate='%{x:.1f}%<extra></extra>')  # Display value on hover, in percentage format
 
     data = [trace_aanwezig, trace_afwezig, trace_verontschuldigd]
 

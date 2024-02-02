@@ -305,7 +305,9 @@ def update_pie_charts(selected_data):
                 colors = ['green', 'red', 'orange']
 
                 # Create a custom hovertemplate without mentioning 'trace 0'
-                hovertemplate = "<b>aantal leden</b>: %{value}"
+                # <extra></extra> tag removes the part of the hover where the trace name is usually displayed in a contrasting color
+                # see https://plotly.com/python/hover-text-and-formatting/
+                hovertemplate = "<b>aantal leden</b>: %{value}<extra></extra>"
 
                 # Create the Pie chart directly with the custom hovertemplate
                 pie_chart = go.Pie(
