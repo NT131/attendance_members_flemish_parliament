@@ -369,12 +369,19 @@ def update_chart(selected_axis, written_questions_df_input):
                      color='Partij',
                      color_discrete_map=minister_colors,
                      labels={'x': 'Minister', 'y': 'Aantal vragen'},
-                     title='Vragen aan ministers')
+                     title='Vragen aan ministers',
+                     custom_data = ['Partij']
+                     )
         # Update x-axis to reflect the sorted order
         fig.update_xaxes(categoryorder='total descending')
         
         # Reset height of entire graph (enlarged for 'vraagsteller)
         fig.update_layout(height=500)
+        
+        # Update hover template with customdata
+        fig.update_traces(
+            hovertemplate="<b>%{x}</b> (%{customdata[0]}) ontving %{y} vragen<extra></extra>",
+        ) 
         
     elif selected_axis == 'partij':
         grouped_data = written_questions_df_input['vraagsteller_partij'].value_counts().reset_index()
@@ -389,6 +396,11 @@ def update_chart(selected_axis, written_questions_df_input):
         
         # Reset height of entire graph (enlarged for 'vraagsteller)
         fig.update_layout(height=500)
+        
+        # Update hover template with customdata
+        fig.update_traces(
+            hovertemplate="Leden van <b>%{x}</b> stelden samen %{y} vragen<extra></extra>",
+        ) 
         
     elif selected_axis == 'thema':
         grouped_data = written_questions_df_input['thema'].value_counts().reset_index()
@@ -407,6 +419,16 @@ def update_chart(selected_axis, written_questions_df_input):
             )
         # Update y-axis to reflect the sorted order
         fig.update_yaxes(categoryorder='total ascending')
+        
+        # Update hover template with customdata
+        fig.update_traces(
+            hovertemplate="%{x} vragen handelden over %{y}<extra></extra>",
+        ) 
+        
+        # Reset height of entire graph (enlarged for 'vraagsteller)
+        fig.update_layout(height=800)
+        
+
   
     else:
         fig = px.bar()
