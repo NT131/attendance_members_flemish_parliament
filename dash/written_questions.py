@@ -328,7 +328,9 @@ def update_chart(selected_axis, written_questions_df_input):
                       color='Partij',
                       color_discrete_map=party_colors,
                       labels={'x': 'Parlementslid', 'y': 'Aantal vragen'},
-                      title='Vragen per parlementslid')
+                      title='Vragen per parlementslid',
+                      custom_data = ['Partij']
+                      )
         
         
         # Update y-axis to reflect the sorted order
@@ -339,6 +341,12 @@ def update_chart(selected_axis, written_questions_df_input):
             height=2000,  # Set the height of the figure
             bargap=0.2,  # Set the gap between bars
         )
+        
+        # Update hover template with customdata
+        fig.update_traces(
+            hovertemplate="<b>%{y}</b> (%{customdata[0]}) stelde %{x} vragen<extra></extra>",
+        ) 
+        
         
         # # Adjust the space between y-axis labels and the axis
         # fig.update_layout(
