@@ -65,6 +65,94 @@ minister_groups = {
 }
 
 
+# Competence allocation of policy domains to ministers, based on 
+# the Decree of 2 October 2019 of the Flemish Goverment to attribute the competences of the members of the Flemish Government
+# i.e. ("Besluit van 2 oktober 2019 van de Vlaamse Regering tot bepaling van de bevoegdheden van de leden van de Vlaamse Regering")
+# See https://codex.vlaanderen.be/Zoeken/Document.aspx?DID=1032376&param=informatie
+
+# This decree allocates the competences as they are identified by the 
+# Decree of 3 June 2005 of the Flemish Government relating the organisation of the Flemish administration
+# i.e. (Besluit van 3 juni 2005 van de Vlaamse Regering met betrekking tot de organisatie van de Vlaamse administratie)
+# See https://codex.vlaanderen.be/Zoeken/Document.aspx?DID=1013986&param=informatie
+
+party_2_domain = {
+    'cd&v': [
+    # '#f5822a': [  # cd&v color
+        # Benjamin Dalle
+        'Jeugdwerk', 
+        'Media', 
+        'Brussel en de Vlaamse Rand',  # Appears to be split: 'Brussel' for Dalle, 'Vlaamse Rand' for Weyts, se art. 5 and 10 Decree 2019
+        'Armoedebeleid', 
+        
+        # Hilde Crevits / Wouter Beke
+        'Gezondheid',
+        'Welzijn en Gezin', 
+        
+        # Jo Broens / HIlde Crevits,
+        'Economie', 
+        'Sociale Economie', 
+        'Wetenschap en Innovatie',
+        'Werk', 
+        'Landbouw en Visserij',
+        ],
+    
+    'N-VA': [
+    # '#ffac12': [  # N-VA color
+        # Ben Weyts':
+        'Onderwijs en Vorming',
+        'Dierenwelzijn',
+        'Sport',
+        
+        # Matthias Diependaele
+        'Financiën', 
+        'Begroting',
+        'Onroerend Erfgoed',
+        'Wonen',
+
+        # Jan Jambon
+        'Europese instellingen',  # unclear, but seems to be part of 'buitenlands bestuur', art. 3 Decree 2005
+        'Ontwikkelingssamenwerking',
+        'Buitenlands Beleid',
+        'Internationaal Ondernemen', 
+        'Cultuur', 
+        'Vlaamse Regering',
+        'Vlaams Parlement',  # unclear
+        'Staatshervorming en Communautaire Aangelegenheden', # unclear
+        
+        # Zuhal Demir
+        'Natuur en Milieu', 
+        'Ruimtelijke ordening', # part of 'Omgeving en natuur', see art. 13 Decree 2005
+        'Toerisme', 
+        'Justitie',
+        'Energie',
+        ],
+        
+    'Open Vld': [
+    # '#003d6d': [  # Open Vld color
+        # Bart Somers / Gwendolyne Rutten
+        'Lokale Overheden',
+        'Stedelijk beleid', 
+        'Vlaamse Administratie',  # unclear
+        'Gelijke Kansen', 
+        'Inburgering', 
+        'Radicalisering', # unclear
+        
+        # Lydia Peeters
+        'Openbare werken', 
+        'Mobiliteit en Verkeer', 
+        ],
+}
+
+    
+# Create a dictionary to map themes to their respective parties
+theme_to_party = {}
+for party, themes in party_2_domain.items():
+    for theme in themes:
+        theme_to_party[theme] = party
+
+# Map theme colors to their respective parties using party_colors dictionary
+theme_colors = {theme: party_colors[party] for theme, party in theme_to_party.items()}
+
 # =============================================================================
 # # Initiate dash app
 # =============================================================================
@@ -408,13 +496,14 @@ def update_chart(selected_axis, written_questions_df_input):
         fig = px.bar(grouped_data,
                      x='Aantal vragen',
                      y='Thema',
-                     # color='Thema',  # You can use 'color_discrete_map' if needed
+                     color='Thema',
+                     color_discrete_map=theme_colors, # Use theme_colors for color mapping
                      labels={'x': 'Thema', 'y': 'Aantal vragen'},
                      title='Vragen per thema')
         
         # Modify height of entire graph (static) to ensure all entries are properly shown 
         fig.update_layout(
-            height=600,  # Set the height of the figure
+            height=800,  # Set the height of the figure
             bargap=0.2,  # Set the gap between bars
             )
         # Update y-axis to reflect the sorted order
@@ -425,10 +514,24 @@ def update_chart(selected_axis, written_questions_df_input):
             hovertemplate="%{x} vragen handelden over %{y}<extra></extra>",
         ) 
         
-        # Reset height of entire graph (enlarged for 'vraagsteller)
-        fig.update_layout(height=800)
+        # # Reset height of entire graph (enlarged for 'vraagsteller)
+        # fig.update_layout(height=800)
         
-
+        # # Define legend items
+        # legend_items = []
+        # for color, themes in party_2_domain.items():
+        #     legend_items.append(go.layout.LegendItem(label=', '.join(themes), traceindex=0, tracegroup=0, bgcolor=color, bordercolor=color))
+        
+        # # Update legend with custom items
+        # fig.update_layout(
+        #     legend_title="Parties",
+        #     legend_traceorder="normal",  # Ensure legend items are ordered as they appear in the plot
+        #     legend=dict(
+        #         title="Parties",
+        #         traceorder="normal",
+        #         items=legend_items,
+        #     )
+        #     )
   
     else:
         fig = px.bar()
